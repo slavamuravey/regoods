@@ -1,0 +1,21 @@
+{
+  "name": "regoods",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "sandbox": "APP_PATH=`pwd` node cmd/sandbox.js",
+    "login": "APP_PATH=`pwd` node cmd/login.js",
+    "lk": "APP_PATH=`pwd` node cmd/lk.js"
+  },
+  "keywords": [],
+  "author": "slavamuravey",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "chromedriver": "^103.0.0",
+    "dotenv": "^16.0.1",
+    "luxon": "^3.0.1",
+    "selenium-webdriver": "^4.3.1"
+  }
+}
