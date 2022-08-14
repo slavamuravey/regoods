@@ -7,14 +7,20 @@ async function pollSmsCode(rentId, findNewSmsCode) {
 
   try {
     return await Promise.race([
-      new Promise(resolve => {
+      new Promise((resolve, reject) => {
         interval = setInterval(async () => {
           let data;
 
           try {
             data = await smsActivateClient.getRentStatus({id: rentId});
           } catch (e) {
-            console.log(e.message);
+            if (e.message !== "STATUS_WAIT_CODE") {
+              reject(e.message);
+
+              return;
+            }
+
+            console.log("wait for the first sms.");
 
             return;
           }
