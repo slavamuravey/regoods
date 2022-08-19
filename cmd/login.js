@@ -4,14 +4,19 @@ const dotenv = require("dotenv");
 dotenv.config({ path: findEnvFile(path.dirname(__dirname), process.env.NODE_ENV) });
 
 const {login} = require("../app/usecase/login");
-const {seleniumWebdriver: driver} = require("../app/service/selenium-webdriver");
+const {container} = require("../app/service-container");
 
 (async () => {
+  let driver;
+
   try {
-    await login();
+    driver = container.get("selenium-webdriver");
+
+    await login("79309663292");
+
+    driver.quit();
   } catch (e) {
     console.log(e);
-  } finally {
-    driver.quit();
+    driver?.quit();
   }
 })();

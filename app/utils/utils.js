@@ -10,7 +10,22 @@ async function createSnapshot(filePath, image) {
   fs.writeFileSync(filePath, image, "base64");
 }
 
+function createCookiesFilePath(userId) {
+  return path.resolve(createUserIdDirPath(userId), "cookies.json");
+}
+
+function createUserIdDirPath(userId) {
+  return path.resolve(process.env.APP_PATH, "data/wb-user", userId);
+}
+
+function createRentIdFilePath(userId) {
+  return path.resolve(createUserIdDirPath(userId), "rent-id.txt");
+}
+
 module.exports = {
   createSnapshotDirPath,
-  createSnapshot
+  createSnapshot,
+  createCookiesFilePath,
+  createUserIdDirPath,
+  createRentIdFilePath
 };

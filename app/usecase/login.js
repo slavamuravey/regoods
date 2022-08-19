@@ -1,15 +1,14 @@
 const {By, Key} = require("selenium-webdriver");
-const {DateTime} = require("luxon");
-const {pollSmsCode, getRentIdByPhone} = require("./utils");
-const {WbUser} = require("../entity/wb-user");
-const {wbUserRepository} = require("../service/wb-user-repository");
-const {seleniumWebdriver: driver} = require("../service/selenium-webdriver");
+const {container} = require("../service-container");
 const {SECOND} = require("../../libs/time");
 const path = require("path");
 const {createSnapshotDirPath, createSnapshot} = require("../utils/utils");
-const {smsActivateClient} = require("../service/sms-activate-client");
 
 async function login(wbUserId) {
+  const driver = container.get("selenium-webdriver");
+  const wbUserRepository = container.get("wb-user-repository");
+  const codeReceiver = container.get("code-receiver");
+
   await driver.get("https://www.wildberries.ru");
 
   await driver.sleep(SECOND);
@@ -18,16 +17,15 @@ async function login(wbUserId) {
   await loginLink.click();
   await driver.sleep(SECOND);
 
-  let phone;
+  let wbUser;
 
-  if (!wbUserId) {
-    const data = await smsActivateClient.getRentNumber({service: "uu"});
-    phone = data.phone.number;
-  } else {
-    phone = wbUserId;
+  try {
+    wbUser = await wbUserRepository.find(wbUserId);
+  } catch (e) {
+    wbUser = await wbUserRepository.create();
   }
 
-  const rentId = await getRentIdByPhone(phone);
+  const phone = wbUser.id;
 
   const phoneInput = driver.findElement(By.className("input-item"));
   await phoneInput.sendKeys(Key.HOME);
@@ -37,27 +35,7 @@ async function login(wbUserId) {
   await driver.findElement(By.id("requestCode")).click();
   await driver.sleep(SECOND * 5);
 
-  const now = DateTime.now();
-
-  const code = await pollSmsCode(rentId, data => {
-    const date = data?.values?.[0]?.date;
-
-    if (!date) {
-      throw new Error('no "date" field in response.');
-    }
-
-    const lastSmsDateTime = DateTime.fromFormat(`${date} +3`, "y-LL-dd TT Z");
-
-    if (!lastSmsDateTime.isValid) {
-      throw new Error(`invalid value "${date}" for field "date" in response, reason: ${lastSmsDateTime.invalidReason}.`);
-    }
-
-    if (lastSmsDateTime > now) {
-      return data?.values?.[0]?.text?.match(/(\d+)/)[0];
-    }
-
-    throw new Error(`last code is outdated: now is "${now}", last date is: ${lastSmsDateTime}`);
-  });
+  const code = await codeReceiver.receiveCode(phone);
 
   const codeInput = driver.findElement(By.className("j-input-confirm-code"));
   await codeInput.sendKeys(code);
@@ -65,10 +43,7 @@ async function login(wbUserId) {
 
   const cookies = await driver.manage().getCookies();
 
-  const wbUser = new WbUser(phone);
-  wbUser.setCookie(cookies);
-
-  await wbUserRepository.create(wbUser);
+  await wbUserRepository.update(wbUser.id, {cookies});
 
   const image = await driver.takeScreenshot();
 

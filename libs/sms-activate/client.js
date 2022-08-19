@@ -26,16 +26,6 @@ class Client {
     );
   }
 
-  async getRentList() {
-    const { data } = await this.httpClient.get("", {
-      params: {
-        action: "getRentList"
-      }
-    });
-
-    return data;
-  }
-
   async getRentNumber({ service }) {
     const { data } = await this.httpClient.get("", {
       params: {

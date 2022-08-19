@@ -1,41 +1,77 @@
 const fs = require("fs");
-const {WbUser} = require("../entity/wb-user");
-const path = require("path");
+const {createUserIdDirPath, createCookiesFilePath, createRentIdFilePath} = require("../utils/utils");
 
 class WbUserRepository {
+  smsActivateClient;
+
+  constructor(smsActivateClient) {
+    this.smsActivateClient = smsActivateClient;
+  }
+
   async find(id) {
-    const userIdDir = this.createUserIdDirPath(id);
+    const userIdDir = createUserIdDirPath(id);
 
     await fs.promises.access(userIdDir, fs.constants.F_OK);
 
-    const user = new WbUser(id);
+    const result = {
+      id
+    };
+
+    let cookies;
 
     try {
-      const cookie = await fs.promises.readFile(this.createCookieFilePath(id), { encoding: "utf8" });
-      user.setCookie(JSON.parse(cookie));
+      cookies = await fs.promises.readFile(createCookiesFilePath(id), { encoding: "utf8" });
+      result.cookies = JSON.parse(cookies);
     } catch (e) {}
 
-    return user;
+    return result;
   }
 
-  async create(user) {
-    const userIdDir = this.createUserIdDirPath(user.id);
+  async create(payload) {
+    let phone, rentId;
+
+    if (!payload?.id) {
+      const data = await this.smsActivateClient.getRentNumber({service: "uu"});
+      phone = data.phone.number;
+      rentId = data.phone.id;
+    } else {
+      phone = payload.id;
+    }
+
+    const userIdDir = createUserIdDirPath(phone);
+
+    let isUserExists;
+
+    try {
+      await fs.promises.access(userIdDir, fs.constants.F_OK);
+
+      isUserExists = true;
+    } catch (e) {
+      isUserExists = false;
+    }
+
+    if (isUserExists) {
+      throw new Error(`user "${phone}" already exists.`);
+    }
 
     await fs.promises.mkdir(userIdDir, { recursive: true });
 
-    const cookie = user.getCookie();
-
-    if (cookie) {
-      await fs.promises.writeFile(this.createCookieFilePath(user.id), JSON.stringify(cookie));
+    if (rentId) {
+      await fs.promises.writeFile(createRentIdFilePath(phone), String(rentId));
     }
+
+    await this.update(phone, {cookies: payload?.cookies});
+
+    return {
+      id: phone,
+      cookies: payload?.cookies
+    };
   }
 
-  createCookieFilePath(userId) {
-    return path.resolve(this.createUserIdDirPath(userId), "cookie.json");
-  }
-
-  createUserIdDirPath(userId) {
-    return path.resolve(process.env.APP_PATH, "data/wb-user", userId);
+  async update(id, payload) {
+    if (payload.cookies) {
+      await fs.promises.writeFile(createCookiesFilePath(id), JSON.stringify(payload.cookies));
+    }
   }
 }
 
