@@ -1,9 +1,10 @@
-const path = require("path");
-const {findEnvFile} = require("./../libs/env");
-const dotenv = require("dotenv");
+import path from "path";
+import {findEnvFile} from "../libs/env";
+import dotenv from "dotenv";
+
 dotenv.config({ path: findEnvFile(path.dirname(__dirname), process.env.NODE_ENV) });
 
-const {container} = require("../app/service-container");
+import {container} from "../app/service-container";
 
 (async () => {
   try {

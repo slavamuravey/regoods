@@ -1,4 +1,4 @@
-const environment = {
+export const environment = {
   api: {
     smsActivate: {
       axios: {
@@ -9,8 +9,4 @@ const environment = {
       }
     }
   }
-}
-
-module.exports = {
-  environment
 }

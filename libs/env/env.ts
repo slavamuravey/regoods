@@ -1,10 +1,10 @@
-const fs = require("fs");
+import fs from "fs";
 
-function createEnvPath(dirname, envFileName) {
+function createEnvPath(dirname: string, envFileName: string): string {
   return `${dirname}/${envFileName}`;
 }
 
-function findEnvFile(dirname, env) {
+export function findEnvFile(dirname: string, env?: string): string {
   if (env !== undefined) {
     const localEnvFile = createEnvPath(dirname, `.env.${env}.local`);
 
@@ -23,7 +23,3 @@ function findEnvFile(dirname, env) {
 
   return createEnvPath(dirname, ".env");
 }
-
-module.exports = {
-  findEnvFile
-};

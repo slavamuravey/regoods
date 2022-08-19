@@ -1,20 +1,23 @@
-const {SECOND} = require("../../libs/time");
-const {DateTime} = require("luxon");
-const fs = require("fs");
-const {createRentIdFilePath} = require("../utils/utils");
+import {SECOND} from "../../libs/time";
+import {DateTime} from "luxon";
+import fs from "fs";
+import {createRentIdFilePath} from "../utils/utils";
+import { Client } from "../../libs/sms-activate";
+import { GetRentStatusResponse } from "../../libs/sms-activate/types";
+import type {CodeReceiver as CodeReceiverInterface} from "./types";
 
-class CodeReceiver {
-  smsActivateClient;
+export class CodeReceiver implements CodeReceiverInterface {
+  smsActivateClient: Client;
 
-  constructor(smsActivateClient) {
+  constructor(smsActivateClient: Client) {
     this.smsActivateClient = smsActivateClient;
   }
 
-  async receiveCode(phone) {
+  async receiveCode(phone: string): Promise<string | unknown> {
     const now = DateTime.now();
     const rentId = await fs.promises.readFile(createRentIdFilePath(phone), { encoding: "utf8" });
 
-    return await this.pollSmsCode(rentId, data => {
+    return await this.pollSmsCode(rentId, (data: GetRentStatusResponse) => {
       const date = data?.values?.[0]?.date;
 
       if (!date) {
@@ -28,26 +31,32 @@ class CodeReceiver {
       }
 
       if (lastSmsDateTime > now) {
-        return data?.values?.[0]?.text?.match(/(\d+)/)[0];
+        return data?.values?.[0]?.text?.match(/(\d+)/)?.[0];
       }
 
       throw new Error(`last code is outdated: now is "${now}", last date is: ${lastSmsDateTime}`);
     });
   }
 
-  async pollSmsCode(rentId, findNewSmsCode) {
+  private async pollSmsCode(rentId: string, findNewSmsCode: (data: GetRentStatusResponse) => string | unknown) {
     let interval;
     let timeout;
 
     try {
       return await Promise.race([
-        new Promise((resolve, reject) => {
+        new Promise<string | unknown>((resolve, reject) => {
           interval = setInterval(async () => {
             let data;
 
             try {
               data = await this.smsActivateClient.getRentStatus({id: rentId});
-            } catch (e) {
+
+              if (data.status === "finish") {
+                reject(`rent "${rentId}" has finished.`);
+
+                return;
+              }
+            } catch (e: any) {
               if (e.message !== "STATUS_WAIT_CODE") {
                 reject(e.message);
 
@@ -63,7 +72,7 @@ class CodeReceiver {
               const code = findNewSmsCode(data);
 
               resolve(code);
-            } catch (e) {
+            } catch (e: any) {
               console.log("no new code: ", e.message);
             }
           }, SECOND);
@@ -82,7 +91,3 @@ class CodeReceiver {
     }
   }
 }
-
-module.exports = {
-  CodeReceiver
-};

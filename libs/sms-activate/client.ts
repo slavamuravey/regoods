@@ -1,9 +1,11 @@
-const axios = require("axios");
+import axios from "axios";
+import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import type { GetRentNumberRequest, GetRentNumberResponse, GetRentStatusRequest, GetRentStatusResponse } from "./types";
 
-class Client {
-  httpClient;
+export class Client {
+  httpClient: AxiosInstance;
 
-  constructor(config) {
+  constructor(config: AxiosRequestConfig) {
     this.httpClient = axios.create({ ...config });
 
     this.httpClient.interceptors.response.use(
@@ -26,7 +28,7 @@ class Client {
     );
   }
 
-  async getRentNumber({ service }) {
+  async getRentNumber({ service }: GetRentNumberRequest): Promise<GetRentNumberResponse> {
     const { data } = await this.httpClient.get("", {
       params: {
         action: "getRentNumber",
@@ -37,7 +39,7 @@ class Client {
     return data;
   }
 
-  async getRentStatus({ id }) {
+  async getRentStatus({ id }: GetRentStatusRequest): Promise<GetRentStatusResponse>  {
     const { data } = await this.httpClient.get("", {
       params: {
         action: "getRentStatus",
@@ -47,8 +49,4 @@ class Client {
 
     return data;
   }
-}
-
-module.exports = {
-  Client
 }

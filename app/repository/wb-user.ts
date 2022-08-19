@@ -1,19 +1,22 @@
-const fs = require("fs");
-const {createUserIdDirPath, createCookiesFilePath, createRentIdFilePath} = require("../utils/utils");
+import fs from "fs";
+import {createUserIdDirPath, createCookiesFilePath, createRentIdFilePath} from "../utils/utils";
+import type { UpdatePayload, CreatePayload, WbUserRepository as WbUserRepositoryInterface } from "./types";
+import type { WbUser } from "../entity/wb-user";
+import { Client } from "../../libs/sms-activate";
 
-class WbUserRepository {
-  smsActivateClient;
+export class WbUserRepository implements WbUserRepositoryInterface {
+  smsActivateClient: Client;
 
-  constructor(smsActivateClient) {
+  constructor(smsActivateClient: Client) {
     this.smsActivateClient = smsActivateClient;
   }
 
-  async find(id) {
+  async find(id: string): Promise<WbUser> {
     const userIdDir = createUserIdDirPath(id);
 
     await fs.promises.access(userIdDir, fs.constants.F_OK);
 
-    const result = {
+    const result: WbUser = {
       id
     };
 
@@ -27,7 +30,7 @@ class WbUserRepository {
     return result;
   }
 
-  async create(payload) {
+  async create(payload: CreatePayload): Promise<WbUser> {
     let phone, rentId;
 
     if (!payload?.id) {
@@ -68,13 +71,9 @@ class WbUserRepository {
     };
   }
 
-  async update(id, payload) {
+  async update(id: string, payload: UpdatePayload): Promise<void> {
     if (payload.cookies) {
       await fs.promises.writeFile(createCookiesFilePath(id), JSON.stringify(payload.cookies));
     }
   }
 }
-
-module.exports = {
-  WbUserRepository
-};

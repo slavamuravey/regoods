@@ -1,10 +1,11 @@
-require("chromedriver");
-const {Builder} = require("selenium-webdriver");
-const chrome = require("selenium-webdriver/chrome");
-const firefox = require("selenium-webdriver/firefox");
+import "chromedriver";
+import { Builder, ThenableWebDriver } from "selenium-webdriver";
+import chrome from "selenium-webdriver/chrome";
+import firefox from "selenium-webdriver/firefox";
+import type { Container, ServiceFactory } from "../../../libs/service-container/types";
 
-class SeleniumWebdriverFactory {
-  create(container) {
+export class SeleniumWebdriverFactory implements ServiceFactory {
+  create(container: Container): ThenableWebDriver {
     const screen = {
       width: 1920,
       height: 1080
@@ -21,7 +22,3 @@ class SeleniumWebdriverFactory {
       .build();
   }
 }
-
-module.exports = {
-  SeleniumWebdriverFactory
-};
