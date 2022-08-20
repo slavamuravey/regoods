@@ -7,7 +7,7 @@ import { GetRentStatusResponse } from "../../libs/sms-activate/types";
 import type {CodeReceiver as CodeReceiverInterface} from "./types";
 
 export class CodeReceiver implements CodeReceiverInterface {
-  smsActivateClient: Client;
+  private smsActivateClient: Client;
 
   constructor(smsActivateClient: Client) {
     this.smsActivateClient = smsActivateClient;

@@ -1,8 +1,8 @@
 import type { Container as ContainerInterface, ServiceSpec } from "./types";
 
 export class Container implements ContainerInterface {
-  spec;
-  services = new Map();
+  private spec: ServiceSpec;
+  private services = new Map<string, any>();
 
   constructor(spec: ServiceSpec) {
     this.spec = spec;

@@ -5,7 +5,7 @@ import type { WbUser } from "../entity/wb-user";
 import { Client } from "../../libs/sms-activate";
 
 export class WbUserRepository implements WbUserRepositoryInterface {
-  smsActivateClient: Client;
+  private smsActivateClient: Client;
 
   constructor(smsActivateClient: Client) {
     this.smsActivateClient = smsActivateClient;

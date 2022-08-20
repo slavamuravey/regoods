@@ -3,7 +3,7 @@ import type { AxiosInstance, AxiosRequestConfig } from "axios";
 import type { GetRentNumberRequest, GetRentNumberResponse, GetRentStatusRequest, GetRentStatusResponse } from "./types";
 
 export class Client {
-  httpClient: AxiosInstance;
+  private httpClient: AxiosInstance;
 
   constructor(config: AxiosRequestConfig) {
     this.httpClient = axios.create({ ...config });
