@@ -1,8 +1,14 @@
 import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
-import type { GetRentNumberRequest, GetRentNumberResponse, GetRentStatusRequest, GetRentStatusResponse } from "./types";
+import type {
+  GetRentNumberRequest,
+  GetRentNumberResponse,
+  GetRentStatusRequest,
+  GetRentStatusResponse,
+  Client as ClientInterface
+} from "./types";
 
-export class Client {
+export class Client implements ClientInterface {
   private httpClient: AxiosInstance;
 
   constructor(config: AxiosRequestConfig) {
@@ -39,7 +45,7 @@ export class Client {
     return data;
   }
 
-  async getRentStatus({ id }: GetRentStatusRequest): Promise<GetRentStatusResponse>  {
+  async getRentStatus({ id }: GetRentStatusRequest): Promise<GetRentStatusResponse> {
     const { data } = await this.httpClient.get("", {
       params: {
         action: "getRentStatus",

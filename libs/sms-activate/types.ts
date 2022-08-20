@@ -26,4 +26,7 @@ export interface GetRentStatusResponse {
   }>
 }
 
-
+export interface Client {
+  getRentNumber({service}: GetRentNumberRequest): Promise<GetRentNumberResponse>;
+  getRentStatus({id}: GetRentStatusRequest): Promise<GetRentStatusResponse>;
+}

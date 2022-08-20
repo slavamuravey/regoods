@@ -2,7 +2,7 @@ import fs from "fs";
 import {createUserIdDirPath, createCookiesFilePath, createRentIdFilePath} from "../utils/utils";
 import type { UpdatePayload, CreatePayload, WbUserRepository as WbUserRepositoryInterface } from "./types";
 import type { WbUser } from "../entity/wb-user";
-import { Client } from "../../libs/sms-activate";
+import { Client } from "../../libs/sms-activate/types";
 
 export class WbUserRepository implements WbUserRepositoryInterface {
   private smsActivateClient: Client;

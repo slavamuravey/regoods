@@ -2,8 +2,7 @@ import {SECOND} from "../../libs/time";
 import {DateTime} from "luxon";
 import fs from "fs";
 import {createRentIdFilePath} from "../utils/utils";
-import { Client } from "../../libs/sms-activate";
-import { GetRentStatusResponse } from "../../libs/sms-activate/types";
+import type { GetRentStatusResponse, Client } from "../../libs/sms-activate/types";
 import type {CodeReceiver as CodeReceiverInterface} from "./types";
 
 export class CodeReceiver implements CodeReceiverInterface {
