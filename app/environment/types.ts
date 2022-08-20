@@ -1,4 +1,5 @@
 import { AxiosRequestConfig } from "axios";
+import { Config } from "../../libs/random-data-tools/types";
 
 export interface Environment {
   api: {
@@ -6,7 +7,7 @@ export interface Environment {
       axios: AxiosRequestConfig
     },
     randomDataTools: {
-      axios: AxiosRequestConfig
+      fetch: Config
     }
   }
 }

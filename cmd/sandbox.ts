@@ -5,10 +5,14 @@ import dotenv from "dotenv";
 dotenv.config({ path: findEnvFile(path.dirname(__dirname), process.env.NODE_ENV) });
 
 import { container } from "../app/service-container";
+import { Client } from "../libs/random-data-tools/types";
 
 (async () => {
   try {
-    await container.get("wb-user-repository").create({ id: "234", cookies: "zzz" });
+    const client: Client = container.get("random-data-tools-client");
+    const name = await client.getRandomName({gender: "woman"});
+
+    console.log(name);
   } catch (e) {
     console.log(e);
   }

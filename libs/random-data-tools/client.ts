@@ -1,18 +1,18 @@
-import axios from "axios";
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import fetch from "node-fetch";
 import type {
+  Client as ClientInterface,
+  Config,
   GetRandomNameRequest,
   GetRandomNameResponse,
   GetRequest,
-  GetResponse,
-  Client as ClientInterface
+  GetResponse
 } from "./types";
 
 export class Client implements ClientInterface {
-  private httpClient: AxiosInstance;
+  private config: Config;
 
-  constructor(config: AxiosRequestConfig) {
-    this.httpClient = axios.create({ ...config });
+  constructor(config: Config) {
+    this.config = config;
   }
 
   async getRandomName({ gender }: GetRandomNameRequest): Promise<GetRandomNameResponse> {
@@ -25,12 +25,15 @@ export class Client implements ClientInterface {
   }
 
   async get(payload: GetRequest): Promise<GetResponse> {
-    const { data } = await this.httpClient.get("", {
-      params: {
-        ...payload
-      }
-    });
+    const url = new URL(this.config.baseURL || "");
+    const params = {
+      ...payload
+    };
 
-    return data;
+    url.search = new URLSearchParams(params as unknown as Record<string, string>).toString();
+
+    const response = await fetch(url);
+
+    return response.json();
   }
 }

@@ -4,6 +4,6 @@ import type { Container, ServiceFactory } from "../../../libs/service-container/
 
 export class RandomDataToolsClientFactory implements ServiceFactory {
   create(container: Container): RandomDataToolsClient {
-    return new RandomDataToolsClient(environment.api.randomDataTools.axios);
+    return new RandomDataToolsClient(environment.api.randomDataTools.fetch);
   }
 }

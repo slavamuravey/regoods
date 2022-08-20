@@ -11,7 +11,7 @@ export const environment: Environment = {
       }
     },
     randomDataTools: {
-      axios: {
+      fetch: {
         baseURL: process.env.RANDOM_DATA_TOOLS_BASE_URL
       }
     }

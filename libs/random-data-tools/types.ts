@@ -21,3 +21,7 @@ export interface Client {
 
   get(payload: GetRequest): Promise<GetResponse>;
 }
+
+export interface Config {
+  baseURL?: string;
+}
