@@ -1,9 +1,9 @@
-import {SECOND} from "../../libs/time";
-import {DateTime} from "luxon";
+import { SECOND } from "../../libs/time";
+import { DateTime } from "luxon";
 import fs from "fs";
-import {createRentIdFilePath} from "../utils/utils";
+import { createRentIdFilePath } from "../utils/utils";
 import type { GetRentStatusResponse, Client } from "../../libs/sms-activate/types";
-import type {CodeReceiver as CodeReceiverInterface} from "./types";
+import type { CodeReceiver as CodeReceiverInterface } from "./types";
 
 export class CodeReceiver implements CodeReceiverInterface {
   private smsActivateClient: Client;
@@ -48,7 +48,7 @@ export class CodeReceiver implements CodeReceiverInterface {
             let data;
 
             try {
-              data = await this.smsActivateClient.getRentStatus({id: rentId});
+              data = await this.smsActivateClient.getRentStatus({ id: rentId });
 
               if (data.status === "finish") {
                 reject(`rent "${rentId}" has finished.`);
@@ -82,7 +82,7 @@ export class CodeReceiver implements CodeReceiverInterface {
           }, SECOND * 60);
         }),
       ]);
-    } catch(e) {
+    } catch (e) {
       throw e;
     } finally {
       clearTimeout(timeout);

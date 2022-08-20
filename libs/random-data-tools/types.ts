@@ -18,5 +18,6 @@ export interface GetRandomNameResponse {
 
 export interface Client {
   getRandomName({ gender }: GetRandomNameRequest): Promise<GetRandomNameResponse>;
+
   get(payload: GetRequest): Promise<GetResponse>;
 }

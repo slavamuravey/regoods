@@ -1,5 +1,5 @@
-import {Client as RandomDataToolsClient} from "../../../libs/random-data-tools";
-import {environment} from "../../environment/environment";
+import { Client as RandomDataToolsClient } from "../../../libs/random-data-tools";
+import { environment } from "../../environment/environment";
 import type { Container, ServiceFactory } from "../../../libs/service-container/types";
 
 export class RandomDataToolsClientFactory implements ServiceFactory {

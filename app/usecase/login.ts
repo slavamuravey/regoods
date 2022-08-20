@@ -1,9 +1,9 @@
 import { By, Key } from "selenium-webdriver";
 import type { ThenableWebDriver } from "selenium-webdriver";
-import {container} from "../service-container";
-import {SECOND} from "../../libs/time";
+import { container } from "../service-container";
+import { SECOND } from "../../libs/time";
 import path from "path";
-import {createSnapshotDirPath, createSnapshot} from "../utils/utils";
+import { createSnapshotDirPath, createSnapshot } from "../utils/utils";
 import type { WbUserRepository } from "../repository/types";
 import type { CodeReceiver } from "../service/types";
 
@@ -50,7 +50,7 @@ export async function login(wbUserId?: string) {
 
   const cookies = await driver.manage().getCookies();
 
-  await wbUserRepository.update(wbUser.id, {cookies});
+  await wbUserRepository.update(wbUser.id, { cookies });
 
   const image = await driver.takeScreenshot();
 

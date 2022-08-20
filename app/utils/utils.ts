@@ -6,7 +6,7 @@ export function createSnapshotDirPath() {
 }
 
 export async function createSnapshot(filePath: string, image: string) {
-  await fs.promises.mkdir(path.dirname(filePath), {recursive: true});
+  await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, image, "base64");
 }
 

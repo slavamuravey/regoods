@@ -1,5 +1,5 @@
 import fs from "fs";
-import {createUserIdDirPath, createCookiesFilePath, createRentIdFilePath} from "../utils/utils";
+import { createUserIdDirPath, createCookiesFilePath, createRentIdFilePath } from "../utils/utils";
 import type { UpdatePayload, CreatePayload, WbUserRepository as WbUserRepositoryInterface } from "./types";
 import type { WbUser } from "../entity/wb-user";
 import { Client } from "../../libs/sms-activate/types";
@@ -25,7 +25,8 @@ export class WbUserRepository implements WbUserRepositoryInterface {
     try {
       cookies = await fs.promises.readFile(createCookiesFilePath(id), { encoding: "utf8" });
       result.cookies = JSON.parse(cookies);
-    } catch (e) {}
+    } catch (e) {
+    }
 
     return result;
   }
@@ -34,7 +35,7 @@ export class WbUserRepository implements WbUserRepositoryInterface {
     let phone, rentId;
 
     if (!payload?.id) {
-      const data = await this.smsActivateClient.getRentNumber({service: "uu"});
+      const data = await this.smsActivateClient.getRentNumber({ service: "uu" });
       phone = data.phone.number;
       rentId = data.phone.id;
     } else {
@@ -63,7 +64,7 @@ export class WbUserRepository implements WbUserRepositoryInterface {
       await fs.promises.writeFile(createRentIdFilePath(phone), String(rentId));
     }
 
-    await this.update(phone, {cookies: payload?.cookies});
+    await this.update(phone, { cookies: payload?.cookies });
 
     return {
       id: phone,

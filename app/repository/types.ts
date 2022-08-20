@@ -12,6 +12,8 @@ export interface UpdatePayload {
 
 export interface WbUserRepository {
   find(id: string): Promise<WbUser>;
+
   create(payload?: CreatePayload): Promise<WbUser>;
+
   update(id: string, payload: UpdatePayload): Promise<void>;
 }

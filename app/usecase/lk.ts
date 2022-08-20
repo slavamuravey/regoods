@@ -1,7 +1,7 @@
-import {SECOND} from "../../libs/time";
+import { SECOND } from "../../libs/time";
 import path from "path";
-import {createSnapshotDirPath, createSnapshot} from "../utils/utils";
-import {container} from "../service-container";
+import { createSnapshotDirPath, createSnapshot } from "../utils/utils";
+import { container } from "../service-container";
 import { ThenableWebDriver } from "selenium-webdriver";
 import type { WbUserRepository } from "../repository/types";
 
