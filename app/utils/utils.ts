@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 
 export function createSnapshotDirPath() {
-  return path.resolve(process.env.APP_PATH!, "data/snapshot");
+  return path.resolve(process.env.APP_PATH!, "data", "snapshot");
 }
 
 export async function createSnapshot(filePath: string, image: string) {
@@ -15,7 +15,7 @@ export function createCookiesFilePath(userId: string): string {
 }
 
 export function createUserIdDirPath(userId: string): string {
-  return path.resolve(process.env.APP_PATH!, "data/wb-user", userId);
+  return path.resolve(process.env.APP_PATH!, "data", "wb-user", userId);
 }
 
 export function createRentIdFilePath(userId: string): string {
