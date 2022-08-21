@@ -10,7 +10,7 @@ import { Client } from "../libs/random-data-tools/types";
 (async () => {
   try {
     const client: Client = container.get("random-data-tools-client");
-    const name = await client.getRandomName({gender: "woman"});
+    const name = await client.getRandomName({ gender: "woman" });
 
     console.log(name);
   } catch (e) {

@@ -1,6 +1,6 @@
 import { SECOND } from "../../libs/time";
 import path from "path";
-import { createSnapshotDirPath, createSnapshot } from "../utils/utils";
+import { createSnapshot, createSnapshotDirPath } from "../utils/utils";
 import { container } from "../service-container";
 import { ThenableWebDriver } from "selenium-webdriver";
 import type { WbUserRepository } from "../repository/types";
@@ -16,7 +16,7 @@ export async function profile(params: ProfileParams) {
   const cookies = wbUser.cookies;
 
   if (!cookies) {
-    throw new Error(`no cookies for user "${params.wbUserId}"`);
+    throw new Error(`no cookies for user "${params.wbUserId}".`);
   }
 
   for (const cookie of cookies) {
@@ -24,7 +24,6 @@ export async function profile(params: ProfileParams) {
   }
 
   await driver.get("https://www.wildberries.ru/lk");
-
   await driver.sleep(SECOND);
 
   const image = await driver.takeScreenshot();

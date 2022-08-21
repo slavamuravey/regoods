@@ -4,6 +4,7 @@ import { SmsActivateClientFactory } from "./service/factory/sms-activate-client"
 import { WbUserRepositoryFactory } from "./service/factory/wb-user-repository";
 import { RandomDataToolsClientFactory } from "./service/factory/random-data-tools-client";
 import { PhoneRenterFactory } from "./service/factory/phone-renter";
+import { RandomNameGeneratorFactory } from "./service/factory/random-name-generator";
 import { Container } from "../libs/service-container";
 
 const spec = new Map();
@@ -25,6 +26,9 @@ spec.set("wb-user-repository", {
 });
 spec.set("phone-renter", {
   factory: new PhoneRenterFactory()
+});
+spec.set("random-name-generator", {
+  factory: new RandomNameGeneratorFactory()
 });
 
 export const container = new Container(spec);
