@@ -1,9 +1,9 @@
 import { SECOND } from "../../libs/time";
 import { DateTime } from "luxon";
 import fs from "fs";
-import { createRentIdFilePath } from "../utils/utils";
-import type { GetRentStatusResponse, Client } from "../../libs/sms-activate/types";
+import type { Client, GetRentStatusResponse } from "../../libs/sms-activate/types";
 import type { CodeReceiver as CodeReceiverInterface } from "./types";
+import { createSmsActiveRentIdFilePath } from "../utils/utils";
 
 export class CodeReceiver implements CodeReceiverInterface {
   private smsActivateClient: Client;
@@ -14,7 +14,7 @@ export class CodeReceiver implements CodeReceiverInterface {
 
   async receiveCode(phone: string): Promise<string | unknown> {
     const now = DateTime.now();
-    const rentId = await fs.promises.readFile(createRentIdFilePath(phone), { encoding: "utf8" });
+    const rentId = await fs.promises.readFile(createSmsActiveRentIdFilePath(phone), { encoding: "utf8" });
 
     return await this.pollSmsCode(rentId, (data: GetRentStatusResponse) => {
       const date = data?.values?.[0]?.date;

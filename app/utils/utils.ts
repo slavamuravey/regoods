@@ -18,6 +18,16 @@ export function createUserIdDirPath(userId: string): string {
   return path.resolve(process.env.APP_PATH!, "data", "wb-user", userId);
 }
 
-export function createRentIdFilePath(userId: string): string {
-  return path.resolve(createUserIdDirPath(userId), "rent-id.txt");
+export function createSmsActiveDirPath(): string {
+  return path.resolve(process.env.APP_PATH!, "data", "sms-active");
+}
+
+export async function createSmsActiveRentId(number: string, rentId: string) {
+  const filePath = createSmsActiveRentIdFilePath(number);
+  await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.promises.writeFile(filePath, rentId);
+}
+
+export function createSmsActiveRentIdFilePath(number: string) {
+  return path.resolve(createSmsActiveDirPath(), `${number}.txt`);
 }

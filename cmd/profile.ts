@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: findEnvFile(path.dirname(__dirname), process.env.NODE_ENV) });
 
-import { lk } from "../app/usecase/lk";
+import { profile } from "../app/usecase/profile";
 import { container } from "../app/service-container";
 
 (async () => {
@@ -13,7 +13,7 @@ import { container } from "../app/service-container";
   try {
     driver = container.get("selenium-webdriver");
 
-    await lk("79309663292");
+    await profile({ wbUserId: "79255566234" });
 
     driver.quit();
   } catch (e) {

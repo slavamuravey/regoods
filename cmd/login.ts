@@ -13,7 +13,7 @@ import { container } from "../app/service-container";
   try {
     driver = container.get("selenium-webdriver");
 
-    await login("79309663292");
+    await login({ wbUserId: "79255566234" });
 
     driver.quit();
   } catch (e) {

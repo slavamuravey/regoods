@@ -3,7 +3,7 @@ import { IWebDriverCookie } from "selenium-webdriver";
 
 export interface CreatePayload {
   id: string;
-  cookies?: IWebDriverCookie[];
+  cookies: IWebDriverCookie[];
 }
 
 export interface UpdatePayload {
@@ -13,7 +13,7 @@ export interface UpdatePayload {
 export interface WbUserRepository {
   find(id: string): Promise<WbUser>;
 
-  create(payload?: CreatePayload): Promise<WbUser>;
+  create(payload: CreatePayload): Promise<WbUser>;
 
   update(id: string, payload: UpdatePayload): Promise<void>;
 }

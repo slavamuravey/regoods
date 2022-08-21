@@ -5,12 +5,14 @@ import { SECOND } from "../../libs/time";
 import path from "path";
 import { createSnapshotDirPath, createSnapshot } from "../utils/utils";
 import type { WbUserRepository } from "../repository/types";
-import type { CodeReceiver } from "../service/types";
+import type { CodeReceiver, PhoneRenter } from "../service/types";
+import type { LoginParams } from "./types";
 
-export async function login(wbUserId?: string) {
+export async function login(params: LoginParams) {
   const driver: ThenableWebDriver = container.get("selenium-webdriver");
   const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
   const codeReceiver: CodeReceiver = container.get("code-receiver");
+  const phoneRenter: PhoneRenter = container.get("phone-renter");
 
   await driver.get("https://www.wildberries.ru");
 
@@ -20,19 +22,14 @@ export async function login(wbUserId?: string) {
   await loginLink.click();
   await driver.sleep(SECOND);
 
-  let wbUser;
+  let phone: string;
 
-  if (!wbUserId) {
-    wbUser = await wbUserRepository.create();
+  if (!params.wbUserId) {
+    const result = await phoneRenter.rent();
+    phone = result.phone;
   } else {
-    try {
-      wbUser = await wbUserRepository.find(wbUserId);
-    } catch (e) {
-      wbUser = await wbUserRepository.create();
-    }
+    phone = params.wbUserId;
   }
-
-  const phone = wbUser.id;
 
   const phoneInput = driver.findElement(By.className("input-item"));
   await phoneInput.sendKeys(Key.HOME);
@@ -50,7 +47,7 @@ export async function login(wbUserId?: string) {
 
   const cookies = await driver.manage().getCookies();
 
-  await wbUserRepository.update(wbUser.id, { cookies });
+  await wbUserRepository.create({ id: phone, cookies });
 
   const image = await driver.takeScreenshot();
 

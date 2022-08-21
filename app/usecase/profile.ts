@@ -4,18 +4,19 @@ import { createSnapshotDirPath, createSnapshot } from "../utils/utils";
 import { container } from "../service-container";
 import { ThenableWebDriver } from "selenium-webdriver";
 import type { WbUserRepository } from "../repository/types";
+import type { ProfileParams } from "./types";
 
-export async function lk(wbUserId: string) {
+export async function profile(params: ProfileParams) {
   const driver: ThenableWebDriver = container.get("selenium-webdriver");
   const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
 
   await driver.get("https://www.wildberries.ru");
 
-  const wbUser = await wbUserRepository.find(wbUserId);
+  const wbUser = await wbUserRepository.find(params.wbUserId);
   const cookies = wbUser.cookies;
 
   if (!cookies) {
-    throw new Error(`no cookies for user "${wbUserId}"`);
+    throw new Error(`no cookies for user "${params.wbUserId}"`);
   }
 
   for (const cookie of cookies) {
@@ -28,5 +29,5 @@ export async function lk(wbUserId: string) {
 
   const image = await driver.takeScreenshot();
 
-  await createSnapshot(path.resolve(createSnapshotDirPath(), "lk.png"), image);
+  await createSnapshot(path.resolve(createSnapshotDirPath(), "profile.png"), image);
 }

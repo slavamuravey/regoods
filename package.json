@@ -6,7 +6,7 @@
   "scripts": {
     "sandbox": "APP_PATH=`pwd` ts-node cmd/sandbox.ts",
     "login": "APP_PATH=`pwd` ts-node cmd/login.ts",
-    "lk": "APP_PATH=`pwd` ts-node cmd/lk.ts"
+    "profile": "APP_PATH=`pwd` ts-node cmd/profile.ts"
   },
   "keywords": [],
   "author": "slavamuravey",

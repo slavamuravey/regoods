@@ -1,17 +1,10 @@
 import fs from "fs";
-import { createUserIdDirPath, createCookiesFilePath, createRentIdFilePath } from "../utils/utils";
+import { createUserIdDirPath, createCookiesFilePath } from "../utils/utils";
 import type { UpdatePayload, CreatePayload, WbUserRepository as WbUserRepositoryInterface } from "./types";
 import type { WbUser } from "../entity/wb-user";
-import { Client } from "../../libs/sms-activate/types";
 import { WbUserAlreadyExists, WbUserNotFoundError } from "./error";
 
 export class WbUserRepository implements WbUserRepositoryInterface {
-  private smsActivateClient: Client;
-
-  constructor(smsActivateClient: Client) {
-    this.smsActivateClient = smsActivateClient;
-  }
-
   async find(id: string): Promise<WbUser> {
     const userIdDir = createUserIdDirPath(id);
 
@@ -37,15 +30,7 @@ export class WbUserRepository implements WbUserRepositoryInterface {
   }
 
   async create(payload: CreatePayload): Promise<WbUser> {
-    let phone, rentId;
-
-    if (!payload?.id) {
-      const data = await this.smsActivateClient.getRentNumber({ service: "uu" });
-      phone = data.phone.number;
-      rentId = data.phone.id;
-    } else {
-      phone = payload.id;
-    }
+    const { id: phone, cookies } = payload;
 
     const userIdDir = createUserIdDirPath(phone);
 
@@ -65,15 +50,11 @@ export class WbUserRepository implements WbUserRepositoryInterface {
 
     await fs.promises.mkdir(userIdDir, { recursive: true });
 
-    if (rentId) {
-      await fs.promises.writeFile(createRentIdFilePath(phone), String(rentId));
-    }
-
-    await this.update(phone, { cookies: payload?.cookies });
+    await this.update(phone, { cookies });
 
     return {
       id: phone,
-      cookies: payload?.cookies
+      cookies
     };
   }
 
