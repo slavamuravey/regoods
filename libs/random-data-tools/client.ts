@@ -32,8 +32,12 @@ export class Client implements ClientInterface {
 
     url.search = new URLSearchParams(params as unknown as Record<string, string>).toString();
 
-    const response = await fetch(url);
+    const response: GetResponse = await fetch(url).then((response) => response.json());
 
-    return response.json();
+    if ("error_code" in response) {
+      throw response;
+    }
+
+    return response;
   }
 }

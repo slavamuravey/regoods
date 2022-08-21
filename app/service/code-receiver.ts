@@ -56,8 +56,8 @@ export class CodeReceiver implements CodeReceiverInterface {
                 return;
               }
             } catch (e: any) {
-              if (e.message !== "STATUS_WAIT_CODE") {
-                reject(e.message);
+              if (e?.message !== "STATUS_WAIT_CODE") {
+                reject(e);
 
                 return;
               }
@@ -71,8 +71,8 @@ export class CodeReceiver implements CodeReceiverInterface {
               const code = findNewSmsCode(data);
 
               resolve(code);
-            } catch (e: any) {
-              console.log("no new code: ", e.message);
+            } catch (e) {
+              console.log("no new code: ", e);
             }
           }, SECOND);
         }),

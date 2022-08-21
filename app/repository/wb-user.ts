@@ -3,6 +3,7 @@ import { createUserIdDirPath, createCookiesFilePath, createRentIdFilePath } from
 import type { UpdatePayload, CreatePayload, WbUserRepository as WbUserRepositoryInterface } from "./types";
 import type { WbUser } from "../entity/wb-user";
 import { Client } from "../../libs/sms-activate/types";
+import { WbUserAlreadyExists, WbUserNotFoundError } from "./error";
 
 export class WbUserRepository implements WbUserRepositoryInterface {
   private smsActivateClient: Client;
@@ -14,7 +15,11 @@ export class WbUserRepository implements WbUserRepositoryInterface {
   async find(id: string): Promise<WbUser> {
     const userIdDir = createUserIdDirPath(id);
 
-    await fs.promises.access(userIdDir, fs.constants.F_OK);
+    try {
+      await fs.promises.access(userIdDir, fs.constants.F_OK);
+    } catch {
+      throw new WbUserNotFoundError(id);
+    }
 
     const result: WbUser = {
       id
@@ -25,7 +30,7 @@ export class WbUserRepository implements WbUserRepositoryInterface {
     try {
       cookies = await fs.promises.readFile(createCookiesFilePath(id), { encoding: "utf8" });
       result.cookies = JSON.parse(cookies);
-    } catch (e) {
+    } catch {
     }
 
     return result;
@@ -50,12 +55,12 @@ export class WbUserRepository implements WbUserRepositoryInterface {
       await fs.promises.access(userIdDir, fs.constants.F_OK);
 
       isUserExists = true;
-    } catch (e) {
+    } catch {
       isUserExists = false;
     }
 
     if (isUserExists) {
-      throw new Error(`user "${phone}" already exists.`);
+      throw new WbUserAlreadyExists(phone);
     }
 
     await fs.promises.mkdir(userIdDir, { recursive: true });
@@ -73,6 +78,14 @@ export class WbUserRepository implements WbUserRepositoryInterface {
   }
 
   async update(id: string, payload: UpdatePayload): Promise<void> {
+    const userIdDir = createUserIdDirPath(id);
+
+    try {
+      await fs.promises.access(userIdDir, fs.constants.F_OK);
+    } catch {
+      throw new WbUserNotFoundError(id);
+    }
+
     if (payload.cookies) {
       await fs.promises.writeFile(createCookiesFilePath(id), JSON.stringify(payload.cookies));
     }
