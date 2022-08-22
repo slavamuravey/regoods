@@ -4,9 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "sandbox": "node -r ts-node/register cmd/sandbox.ts",
-    "login": "node -r ts-node/register cmd/login.ts",
-    "profile": "node -r ts-node/register cmd/profile.ts"
+    "build": "tsc",
+    "login": "node -r ts-node/register src/cmd/login.ts",
+    "profile": "node -r ts-node/register src/cmd/profile.ts"
   },
   "keywords": [],
   "author": "slavamuravey",

@@ -1,19 +1,19 @@
-import path from "path";
+import { ROOT_DIR } from "../settings";
 import { findEnvFile } from "../libs/env";
 import dotenv from "dotenv";
 
-dotenv.config({ path: findEnvFile(path.dirname(__dirname), process.env.NODE_ENV) });
+dotenv.config({ path: findEnvFile(ROOT_DIR, process.env.NODE_ENV) });
 
 import { container } from "../app/service-container";
 import { ThenableWebDriver } from "selenium-webdriver";
-import type { ProfileUsecase } from "../app/usecase/profile";
+import type { LoginUsecase } from "../app/usecase/login";
 
 (async () => {
   const driver: ThenableWebDriver = container.get("selenium-webdriver");
-  const profileUsecase: ProfileUsecase = container.get("profile-usecase");
+  const loginUsecase: LoginUsecase = container.get("login-usecase");
 
   try {
-    await profileUsecase.profile({ wbUserId: "79255566234" });
+    await loginUsecase.login({ gender: "man" });
     driver.quit();
   } catch (e) {
     console.log(e);
