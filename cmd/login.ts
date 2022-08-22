@@ -4,20 +4,19 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: findEnvFile(path.dirname(__dirname), process.env.NODE_ENV) });
 
-import { login } from "../app/usecase/login";
+import type { LoginUsecase } from "../app/usecase/login";
 import { container } from "../app/service-container";
+import { ThenableWebDriver } from "selenium-webdriver";
 
 (async () => {
-  let driver;
+  const driver: ThenableWebDriver = container.get("selenium-webdriver");
+  const loginUsecase: LoginUsecase = container.get("login-usecase");
 
   try {
-    driver = container.get("selenium-webdriver");
-
-    await login({ gender: "man" });
-
+    await loginUsecase.login({ gender: "man" });
     driver.quit();
   } catch (e) {
     console.log(e);
-    driver?.quit();
+    driver.quit();
   }
 })();

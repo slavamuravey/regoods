@@ -1,4 +1,16 @@
-import type { Environment } from "./types";
+import type { AxiosRequestConfig } from "axios";
+import type { Config } from "../../libs/random-data-tools/types";
+
+export interface Environment {
+  api: {
+    smsActivate: {
+      axios: AxiosRequestConfig
+    },
+    randomDataTools: {
+      fetch: Config
+    }
+  }
+}
 
 export const environment: Environment = {
   api: {
