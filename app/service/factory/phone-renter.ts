@@ -1,5 +1,5 @@
-import type { Container, ServiceFactory } from "../../../libs/service-container/types";
 import { PhoneRenterImpl } from "../impl/phone-renter";
+import type { Container, ServiceFactory } from "../../../libs/service-container/types";
 
 export class PhoneRenterFactory implements ServiceFactory {
   create(container: Container): PhoneRenterImpl {

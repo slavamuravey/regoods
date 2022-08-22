@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: findEnvFile(path.dirname(__dirname), process.env.NODE_ENV) });
 
 import { container } from "../app/service-container";
-import { Client } from "../libs/random-data-tools/types";
+import type { Client } from "../libs/random-data-tools/types";
 
 (async () => {
   try {

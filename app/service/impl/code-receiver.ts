@@ -1,9 +1,9 @@
+import fs from "fs";
 import { SECOND } from "../../../libs/time";
 import { DateTime } from "luxon";
-import fs from "fs";
+import { createSmsActiveRentIdFilePath } from "../../utils/utils";
 import type { Client, GetRentStatusResponse } from "../../../libs/sms-activate/types";
 import type { CodeReceiver } from "../code-receiver";
-import { createSmsActiveRentIdFilePath } from "../../utils/utils";
 
 export class CodeReceiverImpl implements CodeReceiver{
   private smsActivateClient: Client;

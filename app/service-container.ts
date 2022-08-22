@@ -1,10 +1,10 @@
 import { CodeReceiverFactory } from "./service/factory/code-receiver";
 import { SeleniumWebdriverFactory } from "./service/factory/selenium-webdriver";
 import { SmsActivateClientFactory } from "./service/factory/sms-activate-client";
-import { WbUserRepositoryFactory } from "./repository/factory/wb-user";
 import { RandomDataToolsClientFactory } from "./service/factory/random-data-tools-client";
 import { PhoneRenterFactory } from "./service/factory/phone-renter";
 import { RandomNameGeneratorFactory } from "./service/factory/random-name-generator";
+import { WbUserRepositoryFactory } from "./repository/factory/wb-user";
 import { LoginUsecaseFactory } from "./usecase/factory/login";
 import { ProfileUsecaseFactory } from "./usecase/factory/profile";
 import { Container } from "../libs/service-container";
