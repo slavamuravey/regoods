@@ -1,8 +1,9 @@
 import path from "path";
 import fs from "fs";
+import { APP_DIR } from "../../settings";
 
 export function createSnapshotDirPath() {
-  return path.resolve(process.env.APP_PATH!, "data", "snapshot");
+  return path.resolve(APP_DIR, "data", "snapshot");
 }
 
 export async function createSnapshot(filePath: string, image: string) {
@@ -15,11 +16,11 @@ export function createCookiesFilePath(userId: string): string {
 }
 
 export function createUserIdDirPath(userId: string): string {
-  return path.resolve(process.env.APP_PATH!, "data", "wb-user", userId);
+  return path.resolve(APP_DIR, "data", "wb-user", userId);
 }
 
 export function createSmsActiveDirPath(): string {
-  return path.resolve(process.env.APP_PATH!, "data", "sms-active");
+  return path.resolve(APP_DIR, "data", "sms-active");
 }
 
 export async function createSmsActiveRentId(number: string, rentId: string) {

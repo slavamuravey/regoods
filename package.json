@@ -4,9 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "sandbox": "APP_PATH=`pwd` ts-node cmd/sandbox.ts",
-    "login": "APP_PATH=`pwd` ts-node cmd/login.ts",
-    "profile": "APP_PATH=`pwd` ts-node cmd/profile.ts"
+    "sandbox": "node -r ts-node/register cmd/sandbox.ts",
+    "login": "node -r ts-node/register cmd/login.ts",
+    "profile": "node -r ts-node/register cmd/profile.ts"
   },
   "keywords": [],
   "author": "slavamuravey",
@@ -14,6 +14,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "chromedriver": "^103.0.0",
+    "commander": "^9.4.0",
     "dotenv": "^16.0.1",
     "luxon": "^3.0.1",
     "node-fetch": "^2.6.7",
