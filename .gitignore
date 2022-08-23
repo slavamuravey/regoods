@@ -2,5 +2,6 @@
 .env.*
 /node_modules
 /build
+*.tsbuildinfo
 /data/*
 !/data/.gitkeep

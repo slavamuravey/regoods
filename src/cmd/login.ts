@@ -1,22 +1,37 @@
-import { ROOT_DIR } from "../settings";
-import { findEnvFile } from "../libs/env";
-import dotenv from "dotenv";
-
-dotenv.config({ path: findEnvFile(ROOT_DIR, process.env.NODE_ENV) });
-
+import { Command, Option } from "commander";
 import { container } from "../app/service-container";
 import { ThenableWebDriver } from "selenium-webdriver";
-import type { LoginUsecase } from "../app/usecase/login";
+import type { LoginParams, LoginUsecase } from "../app/usecase/login";
 
-(async () => {
-  const driver: ThenableWebDriver = container.get("selenium-webdriver");
-  const loginUsecase: LoginUsecase = container.get("login-usecase");
+export const loginCmd = new Command();
 
-  try {
-    await loginUsecase.login({ gender: "man" });
-    driver.quit();
-  } catch (e) {
-    console.log(e);
-    driver.quit();
-  }
-})();
+loginCmd
+  .name("login")
+  .description("login user, if phone is empty, new user will be created")
+  .addOption(new Option("--phone <string>", "user's phone number, ex. 79231234567"))
+  .addOption(new Option("--gender <string>", "user's gender").choices(["man", "woman"]))
+  .action(({ phone, gender }) => {
+    (async () => {
+      const driver: ThenableWebDriver = container.get("selenium-webdriver");
+      const loginUsecase: LoginUsecase = container.get("login-usecase");
+
+      const params: LoginParams = {};
+
+      if (phone) {
+        params.wbUserId = phone;
+      }
+
+      if (gender) {
+        params.gender = gender;
+      }
+
+      try {
+        await loginUsecase.login(params);
+        driver.quit();
+      } catch (e) {
+        console.log(e);
+        driver.quit();
+      }
+    })();
+  });
+

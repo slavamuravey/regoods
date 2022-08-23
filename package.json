@@ -1,12 +1,12 @@
 {
   "name": "regoods",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tool for redemption of goods on Wildberries",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "login": "node -r ts-node/register src/cmd/login.ts",
-    "profile": "node -r ts-node/register src/cmd/profile.ts"
+    "build": "tsc -b src",
+    "cli": "npm run build && node build/cli.js",
+    "cli:dev": "node -r ts-node/register src/cli.ts"
   },
   "keywords": [],
   "author": "slavamuravey",

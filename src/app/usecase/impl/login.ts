@@ -64,18 +64,18 @@ export class LoginUsecaseImpl implements LoginUsecase {
     await driver.sleep(SECOND * 3);
 
     await driver.get("https://www.wildberries.ru/lk/details");
-    await driver.sleep(SECOND);
+    await driver.sleep(SECOND * 3);
 
     let isAccountEmpty: boolean;
 
     try {
       await driver.findElement(By.xpath("//*[@data-name-letter]"));
-      isAccountEmpty = true;
-    } catch {
       isAccountEmpty = false;
+    } catch {
+      isAccountEmpty = true;
     }
 
-    if (isAccountEmpty) {
+    if (!isAccountEmpty) {
       const image = await driver.takeScreenshot();
 
       await createSnapshot(path.resolve(createSnapshotDirPath(), "login-not-empty-account.png"), image);
