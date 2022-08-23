@@ -18,9 +18,9 @@ profileCmd
 
       try {
         await profileUsecase.profile({ wbUserId: phone });
-        driver.quit();
       } catch (e) {
         console.log(e);
+      } finally {
         driver.quit();
       }
     })();

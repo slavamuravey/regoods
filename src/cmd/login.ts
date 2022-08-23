@@ -27,9 +27,9 @@ loginCmd
 
       try {
         await loginUsecase.login(params);
-        driver.quit();
       } catch (e) {
         console.log(e);
+      } finally {
         driver.quit();
       }
     })();
