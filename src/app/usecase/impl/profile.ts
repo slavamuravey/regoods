@@ -1,9 +1,10 @@
-import path from "path";
-import { SECOND } from "../../../libs/time";
-import { createSnapshot, createSnapshotDirPath } from "../../utils/utils";
 import { ThenableWebDriver } from "selenium-webdriver";
 import type { WbUserRepository } from "../../repository/wb-user";
 import type { ProfileParams, ProfileUsecase } from "../profile";
+import type { StepMessage } from "../step-message";
+import { createStepMessage } from "../utils";
+import { Get } from "../actions";
+import { SECOND } from "../../../libs/time";
 
 export class ProfileUsecaseImpl implements ProfileUsecase {
   constructor(readonly driver: ThenableWebDriver, readonly wbUserRepository: WbUserRepository) {
@@ -11,11 +12,13 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
     this.wbUserRepository = wbUserRepository;
   }
 
-  async profile(params: ProfileParams): Promise<void> {
+  async* profile(params: ProfileParams): AsyncGenerator<StepMessage> {
     const driver = this.driver;
     const wbUserRepository = this.wbUserRepository;
 
     await driver.get("https://www.wildberries.ru");
+    await driver.sleep(SECOND);
+    yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page", await driver.takeScreenshot());
 
     const wbUser = await wbUserRepository.find(params.wbUserId);
     const cookies = wbUser.cookies;
@@ -30,9 +33,6 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
 
     await driver.get("https://www.wildberries.ru/lk");
     await driver.sleep(SECOND);
-
-    const image = await driver.takeScreenshot();
-
-    await createSnapshot(path.resolve(createSnapshotDirPath(), "profile.png"), image);
+    yield createStepMessage(new Get("https://www.wildberries.ru/lk"), "Open profile page", await driver.takeScreenshot());
   }
 }

@@ -82,8 +82,6 @@ export class CodeReceiverImpl implements CodeReceiver{
           }, SECOND * 60);
         }),
       ]);
-    } catch (e) {
-      throw e;
     } finally {
       clearTimeout(timeout);
       clearInterval(interval);

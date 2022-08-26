@@ -20,16 +20,14 @@ export interface WbUserRepository {
 
 export class WbUserNotFoundError extends Error {
   constructor(userId: string) {
-    super(userId);
+    super(`user "${userId}" is not found.`);
     this.name = this.constructor.name;
-    this.message = `user "${userId}" is not found.`;
   }
 }
 
 export class WbUserAlreadyExists extends Error {
   constructor(userId: string) {
-    super(userId);
+    super(`user "${userId}" already exists.`);
     this.name = this.constructor.name;
-    this.message = `user "${userId}" already exists.`;
   }
 }
