@@ -1,3 +1,4 @@
+import "chromedriver";
 import chrome from "selenium-webdriver/chrome";
 import { Builder } from "selenium-webdriver";
 import type { ChromeDriverOptions, DriverFactory } from "../types";

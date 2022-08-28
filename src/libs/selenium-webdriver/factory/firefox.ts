@@ -1,3 +1,4 @@
+import "geckodriver";
 import firefox from "selenium-webdriver/firefox";
 import { Builder } from "selenium-webdriver";
 import type { DriverFactory, FirefoxDriverOptions } from "../types";
