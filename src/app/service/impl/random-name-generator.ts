@@ -2,9 +2,7 @@ import type { Client } from "../../../libs/random-data-tools/types";
 import type { Gender, Name, RandomNameGenerator } from "../random-name-generator";
 
 export class RandomNameGeneratorImpl implements RandomNameGenerator {
-  private randomDataToolsClient: Client;
-
-  constructor(randomDataToolsClient: Client) {
+  constructor(readonly randomDataToolsClient: Client) {
     this.randomDataToolsClient = randomDataToolsClient;
   }
 

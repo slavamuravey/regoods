@@ -3,9 +3,7 @@ import type { Client } from "../../../libs/sms-activate/types";
 import { createSmsActiveRentId } from "../../utils/utils";
 
 export class PhoneRenterImpl implements PhoneRenter {
-  private smsActivateClient: Client;
-
-  constructor(smsActivateClient: Client) {
+  constructor(readonly smsActivateClient: Client) {
     this.smsActivateClient = smsActivateClient;
   }
 
