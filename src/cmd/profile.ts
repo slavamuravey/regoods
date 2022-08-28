@@ -1,8 +1,7 @@
 import { Command, Option } from "commander";
 import { container } from "../app/service-container";
-import { ThenableWebDriver } from "selenium-webdriver";
-import type { ProfileUsecase } from "../app/usecase/profile";
 import { ProfileUsecaseError } from "../app/usecase/profile";
+import type { ProfileUsecase } from "../app/usecase/profile";
 import type { StepMessage } from "../app/usecase/step-message";
 
 export const profileCmd = new Command();
@@ -13,12 +12,15 @@ profileCmd
   .addOption(
     new Option("--phone <string>", "user's phone number, ex. 79231234567").makeOptionMandatory(true)
   )
-  .action(({ phone }) => {
+  .addOption(
+    new Option("--browser <string>", "browser name").choices(["chrome", "firefox"]).default("chrome")
+  )
+  .addOption(new Option("--headless", "enable headless mode"))
+  .action(({ phone, browser, headless }) => {
     (async () => {
-      const driver: ThenableWebDriver = container.get("selenium-webdriver");
       const profileUsecase: ProfileUsecase = container.get("profile-usecase");
 
-      const profileGenerator: AsyncGenerator<StepMessage> = profileUsecase.profile({ wbUserId: phone });
+      const profileGenerator: AsyncGenerator<StepMessage> = profileUsecase.profile({ wbUserId: phone, browser, headless });
 
       try {
         for await (const msg of profileGenerator) {
@@ -35,8 +37,6 @@ profileCmd
         }
 
         console.log("internal error: ", e);
-      } finally {
-        driver.quit();
       }
     })();
   });

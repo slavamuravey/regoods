@@ -1,9 +1,8 @@
 import { Command, Option } from "commander";
 import { container } from "../app/service-container";
-import { ThenableWebDriver } from "selenium-webdriver";
-import type { LoginParams, LoginUsecase } from "../app/usecase/login";
-import { StepMessage } from "../app/usecase/step-message";
 import { LoginUsecaseError } from "../app/usecase/login";
+import type { LoginParams, LoginUsecase } from "../app/usecase/login";
+import type { StepMessage } from "../app/usecase/step-message";
 
 export const loginCmd = new Command();
 
@@ -12,12 +11,18 @@ loginCmd
   .description("login user, if phone is empty, new user will be created")
   .addOption(new Option("--phone <string>", "user's phone number, ex. 79231234567"))
   .addOption(new Option("--gender <string>", "user's gender").choices(["man", "woman"]))
-  .action(({ phone, gender }) => {
+  .addOption(
+    new Option("--browser <string>", "browser name").choices(["chrome", "firefox"]).default("chrome")
+  )
+  .addOption(new Option("--headless", "enable headless mode"))
+  .action(({ phone, gender, browser, headless }) => {
     (async () => {
-      const driver: ThenableWebDriver = container.get("selenium-webdriver");
       const loginUsecase: LoginUsecase = container.get("login-usecase");
 
-      const params: LoginParams = {};
+      const params: LoginParams = {
+        browser,
+        headless
+      };
 
       if (phone) {
         params.wbUserId = phone;
@@ -44,9 +49,6 @@ loginCmd
         }
 
         console.log("internal error: ", e);
-      } finally {
-        driver.quit();
       }
     })();
   });
-

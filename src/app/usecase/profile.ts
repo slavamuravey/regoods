@@ -1,6 +1,7 @@
 import type { StepMessage } from "./step-message";
+import type { BrowserParams } from "./browser-params";
 
-export interface ProfileParams {
+export interface ProfileParams extends BrowserParams {
   wbUserId: string;
 }
 

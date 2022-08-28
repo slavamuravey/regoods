@@ -1,5 +1,4 @@
 import { CodeReceiverFactory } from "./service/factory/code-receiver";
-import { SeleniumWebdriverFactory } from "./service/factory/selenium-webdriver";
 import { SmsActivateClientFactory } from "./service/factory/sms-activate-client";
 import { RandomDataToolsClientFactory } from "./service/factory/random-data-tools-client";
 import { PhoneRenterFactory } from "./service/factory/phone-renter";
@@ -14,9 +13,6 @@ const spec: ServiceSpec = new Map();
 
 spec.set("code-receiver", {
   factory: new CodeReceiverFactory()
-});
-spec.set("selenium-webdriver", {
-  factory: new SeleniumWebdriverFactory()
 });
 spec.set("sms-activate-client", {
   factory: new SmsActivateClientFactory()

@@ -1,8 +1,9 @@
-import { StepMessage } from "./step-message";
+import type { StepMessage } from "./step-message";
+import type { BrowserParams } from "./browser-params";
 
 export type Gender = "man" | "woman";
 
-export interface LoginParams {
+export interface LoginParams extends BrowserParams {
   wbUserId?: string;
   gender?: Gender;
 }
