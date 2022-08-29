@@ -24,13 +24,11 @@ export class LoginUsecaseImpl implements LoginUsecase {
     this.randomNameGenerator = randomNameGenerator;
   }
 
-  async* login(params: LoginParams): AsyncGenerator<StepMessage> {
+  async* login({ wbUserId, gender, browser, headless, quit}: LoginParams): AsyncGenerator<StepMessage> {
     const wbUserRepository = this.wbUserRepository;
     const codeReceiver = this.codeReceiver;
     const phoneRenter = this.phoneRenter;
     const randomNameGenerator = this.randomNameGenerator;
-
-    const { wbUserId, gender, browser, headless} = params;
 
     const driver = createDriver(browser, { headless });
 
@@ -138,7 +136,9 @@ export class LoginUsecaseImpl implements LoginUsecase {
       await wbUserRepository.create({ id: phone, cookies });
       yield createStepMessage(new CreateUser(phone, cookies), "Store user");
     } finally {
-      driver.quit();
+      if (quit) {
+        driver.quit();
+      }
     }
   }
 }

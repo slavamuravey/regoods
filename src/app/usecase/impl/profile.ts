@@ -11,10 +11,8 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
     this.wbUserRepository = wbUserRepository;
   }
 
-  async* profile(params: ProfileParams): AsyncGenerator<StepMessage> {
+  async* profile({ wbUserId, browser, headless, quit}: ProfileParams): AsyncGenerator<StepMessage> {
     const wbUserRepository = this.wbUserRepository;
-
-    const { wbUserId, browser, headless} = params;
 
     const driver = createDriver(browser, { headless });
 
@@ -38,7 +36,9 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
       await driver.sleep(SECOND);
       yield createStepMessage(new Get("https://www.wildberries.ru/lk"), "Open profile page", await driver.takeScreenshot());
     } finally {
-      driver.quit();
+      if (quit) {
+        driver.quit();
+      }
     }
   }
 }

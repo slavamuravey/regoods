@@ -16,27 +16,31 @@ profileCmd
     new Option("--browser <string>", "browser name").choices(["chrome", "firefox"]).default("chrome")
   )
   .addOption(new Option("--headless", "enable headless mode"))
-  .action(({ phone, browser, headless }) => {
-    (async () => {
-      const profileUsecase: ProfileUsecase = container.get("profile-usecase");
+  .addOption(new Option("--no-quit", "turn off quit on finish"))
+  .action(async ({ phone, browser, headless, quit }) => {
+    const profileUsecase: ProfileUsecase = container.get("profile-usecase");
 
-      const profileGenerator: AsyncGenerator<StepMessage> = profileUsecase.profile({ wbUserId: phone, browser, headless });
+    const profileGenerator: AsyncGenerator<StepMessage> = profileUsecase.profile({
+      wbUserId: phone,
+      browser,
+      headless,
+      quit
+    });
 
-      try {
-        for await (const msg of profileGenerator) {
-          console.log({
-            ...msg,
-            screenshot: msg.screenshot?.slice(-10)
-          });
-        }
-      } catch (e) {
-        if (e instanceof ProfileUsecaseError) {
-          console.log(e);
-
-          return;
-        }
-
-        console.log("internal error: ", e);
+    try {
+      for await (const msg of profileGenerator) {
+        console.log({
+          ...msg,
+          screenshot: msg.screenshot?.slice(-10)
+        });
       }
-    })();
+    } catch (e) {
+      if (e instanceof ProfileUsecaseError) {
+        console.log(e);
+
+        return;
+      }
+
+      console.log("internal error: ", e);
+    }
   });

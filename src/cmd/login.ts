@@ -15,40 +15,40 @@ loginCmd
     new Option("--browser <string>", "browser name").choices(["chrome", "firefox"]).default("chrome")
   )
   .addOption(new Option("--headless", "enable headless mode"))
-  .action(({ phone, gender, browser, headless }) => {
-    (async () => {
-      const loginUsecase: LoginUsecase = container.get("login-usecase");
+  .addOption(new Option("--no-quit", "turn off quit on finish"))
+  .action(async ({ phone, gender, browser, headless, quit }) => {
+    const loginUsecase: LoginUsecase = container.get("login-usecase");
 
-      const params: LoginParams = {
-        browser,
-        headless
-      };
+    const params: LoginParams = {
+      browser,
+      headless,
+      quit
+    };
 
-      if (phone) {
-        params.wbUserId = phone;
+    if (phone) {
+      params.wbUserId = phone;
+    }
+
+    if (gender) {
+      params.gender = gender;
+    }
+
+    const loginGenerator: AsyncGenerator<StepMessage> = loginUsecase.login(params);
+
+    try {
+      for await (const msg of loginGenerator) {
+        console.log({
+          ...msg,
+          screenshot: msg.screenshot?.slice(-10)
+        });
+      }
+    } catch (e) {
+      if (e instanceof LoginUsecaseError) {
+        console.log(e);
+
+        return;
       }
 
-      if (gender) {
-        params.gender = gender;
-      }
-
-      const loginGenerator: AsyncGenerator<StepMessage> = loginUsecase.login(params);
-
-      try {
-        for await (const msg of loginGenerator) {
-          console.log({
-            ...msg,
-            screenshot: msg.screenshot?.slice(-10)
-          });
-        }
-      } catch (e) {
-        if (e instanceof LoginUsecaseError) {
-          console.log(e);
-
-          return;
-        }
-
-        console.log("internal error: ", e);
-      }
-    })();
+      console.log("internal error: ", e);
+    }
   });
