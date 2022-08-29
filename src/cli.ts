@@ -8,6 +8,7 @@ import { version, name, description } from "../package.json";
 import { Command } from "commander";
 import { profileCmd } from "./cmd/profile";
 import { loginCmd } from "./cmd/login";
+import { addToCartCmd } from "./cmd/add-to-cart";
 
 const program = new Command();
 
@@ -18,5 +19,6 @@ program
 
 program.addCommand(profileCmd);
 program.addCommand(loginCmd);
+program.addCommand(addToCartCmd);
 
 program.parse();

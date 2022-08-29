@@ -2,16 +2,25 @@ import { createStepMessage } from "../utils";
 import { Get } from "../actions";
 import { SECOND } from "../../../libs/time";
 import { createDriver } from "../../../libs/selenium-webdriver";
+import { AddToCartParams, AddToCartUsecase } from "../add-to-cart";
 import type { WbUserRepository } from "../../repository/wb-user";
-import type { ProfileParams, ProfileUsecase } from "../profile";
 import type { StepMessage } from "../step-message";
 
-export class ProfileUsecaseImpl implements ProfileUsecase {
+export class AddToCartUsecaseImpl implements AddToCartUsecase {
   constructor(readonly wbUserRepository: WbUserRepository) {
     this.wbUserRepository = wbUserRepository;
   }
 
-  async* profile({ wbUserId, browser, headless, quit}: ProfileParams): AsyncGenerator<StepMessage> {
+  async* addToCart({
+                     wbUserId,
+                     vendorCode,
+                     keyPhrase,
+                     size,
+                     address,
+                     browser,
+                     headless,
+                     quit
+                   }: AddToCartParams): AsyncGenerator<StepMessage> {
     const wbUserRepository = this.wbUserRepository;
 
     const driver = createDriver(browser, { headless });

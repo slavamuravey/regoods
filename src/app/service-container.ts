@@ -6,6 +6,7 @@ import { RandomNameGeneratorFactory } from "./service/factory/random-name-genera
 import { WbUserRepositoryFactory } from "./repository/factory/wb-user";
 import { LoginUsecaseFactory } from "./usecase/factory/login";
 import { ProfileUsecaseFactory } from "./usecase/factory/profile";
+import { AddToCartUsecaseFactory } from "./usecase/factory/add-to-cart";
 import { Container } from "../libs/service-container";
 import type { ServiceSpec } from "../libs/service-container/types";
 
@@ -34,6 +35,9 @@ spec.set("login-usecase", {
 });
 spec.set("profile-usecase", {
   factory: new ProfileUsecaseFactory()
+});
+spec.set("add-to-cart-usecase", {
+  factory: new AddToCartUsecaseFactory()
 });
 
 export const container = new Container(spec);

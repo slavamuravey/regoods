@@ -1,15 +1,15 @@
 import { By, Key } from "selenium-webdriver";
 import { SECOND } from "../../../libs/time";
+import { LoginUsecaseError } from "../login";
+import { createStepMessage } from "../utils";
+import { Click, CreateUser, Get, RentPhone, SendKeys } from "../actions";
+import { createDriver } from "../../../libs/selenium-webdriver";
 import type { WbUserRepository } from "../../repository/wb-user";
 import type { CodeReceiver } from "../../service/code-receiver";
 import type { PhoneRenter } from "../../service/phone-renter";
 import type { RandomNameGenerator } from "../../service/random-name-generator";
 import type { LoginParams, LoginUsecase } from "../login";
-import { LoginUsecaseError } from "../login";
 import type { StepMessage } from "../step-message";
-import { createStepMessage } from "../utils";
-import { Click, CreateUser, Get, RentPhone, SendKeys } from "../actions";
-import { createDriver } from "../../../libs/selenium-webdriver";
 
 export class LoginUsecaseImpl implements LoginUsecase {
   constructor(
