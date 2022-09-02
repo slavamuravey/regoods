@@ -142,19 +142,21 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
         yield createStepMessage(new Click(), "Click next page link", await driver.takeScreenshot());
       }
 
-      let sizeButton = null;
+      if (size !== false) {
+        let sizeButton = null;
 
-      try {
-        sizeButton = await driver.findElement(By.xpath(`//span[contains(@class, 'sizes-list__size') and text()='${size}']`));
-      } catch {}
+        try {
+          sizeButton = await driver.findElement(By.xpath(`//span[contains(@class, 'sizes-list__size') and text()='${size}']`));
+        } catch {}
 
-      if (sizeButton === null) {
-        throw new AddToCartUsecaseError(`size "${size}" is not found.`);
+        if (sizeButton === null) {
+          throw new AddToCartUsecaseError(`size "${size}" is not found.`);
+        }
+
+        await sizeButton.click();
+        await driver.sleep(SECOND * 3);
+        yield createStepMessage(new Click(), `Choose size "${size}"`, await driver.takeScreenshot());
       }
-
-      await sizeButton.click();
-      await driver.sleep(SECOND * 3);
-      yield createStepMessage(new Click(), `Choose size "${size}"`, await driver.takeScreenshot());
 
       const detailsHeader = driver.findElement(By.className("details-section__header"));
       await driver.executeScript("arguments[0].scrollIntoView(true);", detailsHeader);

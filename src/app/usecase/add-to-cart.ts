@@ -5,7 +5,7 @@ export interface AddToCartParams extends BrowserParams {
   wbUserId: string;
   vendorCode: string;
   keyPhrase: string;
-  size: string;
+  size: string | boolean;
   address: string;
 }
 

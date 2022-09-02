@@ -21,6 +21,7 @@ addToCartCmd
   .addOption(
     new Option("--size <string>", "the size of product").makeOptionMandatory(true)
   )
+  .addOption(new Option("--no-size", "do not choose size"))
   .addOption(
     new Option("--address <string>", "the address of the the issue point").makeOptionMandatory(true)
   )
