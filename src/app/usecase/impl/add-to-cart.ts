@@ -3,7 +3,7 @@ import { Click, Get, SendKeys } from "../actions";
 import { SECOND } from "../../../libs/time";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import { AddToCartParams, AddToCartUsecase, AddToCartUsecaseError } from "../add-to-cart";
-import { By, Key, until } from "selenium-webdriver";
+import { By, Key } from "selenium-webdriver";
 import type { WbUserRepository } from "../../repository/wb-user";
 import type { StepMessage } from "../step-message";
 
@@ -170,6 +170,40 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       await addToCartButton.click();
       await driver.sleep(SECOND);
       yield createStepMessage(new Click(), "Click add to cart button", await driver.takeScreenshot());
+
+      const cartButton = driver.findElement(By.css("a.btn-base"));
+      await cartButton.click();
+      await driver.sleep(SECOND);
+      yield createStepMessage(new Click(), "Click cart button", await driver.takeScreenshot());
+
+      let choosePayButton = null;
+
+      try {
+        choosePayButton = await driver.findElement(By.className("basket-pay__choose-pay"));
+      } catch {}
+
+      if (choosePayButton === null) {
+        choosePayButton = await driver.findElement(By.css(".basket-pay .btn-edit"));
+      }
+
+      await choosePayButton.click();
+      await driver.sleep(SECOND);
+      yield createStepMessage(new Click(), "Click choose pay method button", await driver.takeScreenshot());
+
+      const qrMethodButton = driver.findElement(By.className("icon-qrc"));
+      await qrMethodButton.click();
+      await driver.sleep(SECOND);
+      yield createStepMessage(new Click(), "Click QR pay method button", await driver.takeScreenshot());
+
+      const popupChooseButton = driver.findElement(By.className("popup__btn-main"));
+      await popupChooseButton.click();
+      await driver.sleep(SECOND);
+      yield createStepMessage(new Click(), "Click popup choose button", await driver.takeScreenshot());
+
+      const doOrderButton = driver.findElement(By.className("b-btn-do-order"));
+      await doOrderButton.click();
+      await driver.sleep(SECOND);
+      yield createStepMessage(new Click(), "Click do order button", await driver.takeScreenshot());
     } finally {
       if (quit) {
         driver.quit();
