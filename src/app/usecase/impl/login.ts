@@ -1,7 +1,7 @@
 import { By, Key } from "selenium-webdriver";
 import { SECOND } from "../../../libs/time";
 import { LoginUsecaseError } from "../login";
-import { createStepMessage } from "../utils";
+import { createStepMessage, getCookies } from "../utils";
 import { Click, CreateUser, Get, RentPhone, SendKeys } from "../actions";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import type { WbUserRepository } from "../../repository/wb-user";
@@ -124,14 +124,7 @@ export class LoginUsecaseImpl implements LoginUsecase {
       await driver.sleep(SECOND);
       yield createStepMessage(new Click(), "Click save name button", await driver.takeScreenshot());
 
-      const cookies = await driver.manage().getCookies();
-      cookies.forEach(cookie => {
-        // @ts-ignore
-        if (cookie?.sameSite === "None") {
-          // @ts-ignore
-          delete cookie.sameSite;
-        }
-      });
+      const cookies = await getCookies(driver);
 
       await wbUserRepository.create({ id: phone, cookies });
       yield createStepMessage(new CreateUser(phone, cookies), "Store user");

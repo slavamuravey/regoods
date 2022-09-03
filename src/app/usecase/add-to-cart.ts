@@ -6,7 +6,7 @@ export interface AddToCartParams extends BrowserParams {
   vendorCode: string;
   keyPhrase: string;
   size: string | boolean;
-  address: string;
+  address: string | boolean;
 }
 
 export interface AddToCartUsecase {

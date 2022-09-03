@@ -25,6 +25,7 @@ addToCartCmd
   .addOption(
     new Option("--address <string>", "the address of the the issue point").makeOptionMandatory(true)
   )
+  .addOption(new Option("--no-address", "do not choose address"))
   .addOption(
     new Option("--browser <string>", "browser name").choices(["chrome", "firefox"]).default("chrome")
   )

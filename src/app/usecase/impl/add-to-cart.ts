@@ -1,9 +1,9 @@
-import { createStepMessage } from "../utils";
+import { createStepMessage, getCookies } from "../utils";
 import { Click, Get, SendKeys } from "../actions";
 import { SECOND } from "../../../libs/time";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import { AddToCartParams, AddToCartUsecase, AddToCartUsecaseError } from "../add-to-cart";
-import { By, Key } from "selenium-webdriver";
+import { By, Key, ThenableWebDriver } from "selenium-webdriver";
 import type { WbUserRepository } from "../../repository/wb-user";
 import type { StepMessage } from "../step-message";
 
@@ -56,7 +56,8 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
         try {
           removeItemButton = await driver.findElement(By.className("btn__del"));
-        } catch {}
+        } catch {
+        }
 
         if (removeItemButton === null) {
           break;
@@ -71,50 +72,13 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       await driver.sleep(SECOND);
       yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page after clean basket", await driver.takeScreenshot());
 
-      const addressLink = driver.findElement(By.className("simple-menu__link--address"));
-      await addressLink.click();
-      await driver.sleep(SECOND * 3);
-      yield createStepMessage(new Click(), "Click address link", await driver.takeScreenshot());
+      if (typeof address === "string") {
+        yield* this.chooseAddress(driver, address);
 
-      const addressInput = driver.findElement(By.css("input[class*='searchbox-input__input']"));
-      await addressInput.sendKeys(address);
-      await driver.sleep(SECOND);
-      yield createStepMessage(new SendKeys(address), "Send address to address input", await driver.takeScreenshot());
+        const cookies = await getCookies(driver);
 
-      await addressInput.sendKeys(Key.RETURN);
-      await driver.sleep(SECOND * 5);
-      yield createStepMessage(new SendKeys(Key.RETURN), "Get suggested addresses", await driver.takeScreenshot());
-
-      let addressDropdownFirstItem = null;
-
-      try {
-        addressDropdownFirstItem = await driver.findElement(By.css("*[class$='islets_serp-popup']:not(*[class$='islets__hidden']) *[class$='islets__first']"));
-      } catch {}
-
-      if (addressDropdownFirstItem !== null) {
-        await addressDropdownFirstItem.click();
-        await driver.sleep(SECOND * 3);
-        yield createStepMessage(new Click(), "Click dropdown first address item", await driver.takeScreenshot());
+        await wbUserRepository.update(wbUserId, { cookies });
       }
-
-      let addressItem = null;
-
-      try {
-        addressItem = await driver.findElement(By.xpath(`//span[text()='${address}']`));
-      } catch {}
-
-      if (addressItem === null) {
-        throw new AddToCartUsecaseError(`address "${address}" is not found.`);
-      }
-
-      await addressItem.click();
-      await driver.sleep(SECOND * 2);
-      yield createStepMessage(new Click(), "Click address item", await driver.takeScreenshot());
-
-      const chooseAddressButton = driver.findElement(By.className("balloon-content-block-btn"));
-      await chooseAddressButton.click();
-      await driver.sleep(SECOND * 2);
-      yield createStepMessage(new Click(), "Choose address", await driver.takeScreenshot());
 
       const searchInput = driver.findElement(By.id("searchInput"));
       await searchInput.sendKeys(keyPhrase);
@@ -130,7 +94,8 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
         try {
           item = await driver.findElement(By.id(`c${vendorCode}`));
-        } catch {}
+        } catch {
+        }
 
         if (item !== null) {
           await item.click();
@@ -143,7 +108,8 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
         try {
           nextPageLink = await driver.findElement(By.className("pagination__next"));
-        } catch {}
+        } catch {
+        }
 
         if (nextPageLink === null) {
           throw new AddToCartUsecaseError(`product with vendor code "${vendorCode}" is not found.`);
@@ -154,20 +120,8 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
         yield createStepMessage(new Click(), "Click next page link", await driver.takeScreenshot());
       }
 
-      if (size !== false) {
-        let sizeButton = null;
-
-        try {
-          sizeButton = await driver.findElement(By.xpath(`//span[contains(@class, 'sizes-list__size') and text()='${size}']`));
-        } catch {}
-
-        if (sizeButton === null) {
-          throw new AddToCartUsecaseError(`size "${size}" is not found.`);
-        }
-
-        await sizeButton.click();
-        await driver.sleep(SECOND * 3);
-        yield createStepMessage(new Click(), `Choose size "${size}"`, await driver.takeScreenshot());
+      if (typeof size === "string") {
+        yield* this.chooseSize(driver, size);
       }
 
       const detailsHeader = driver.findElement(By.className("details-section__header"));
@@ -194,7 +148,8 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
       try {
         choosePayButton = await driver.findElement(By.className("basket-pay__choose-pay"));
-      } catch {}
+      } catch {
+      }
 
       if (choosePayButton === null) {
         choosePayButton = await driver.findElement(By.css(".basket-pay .btn-edit"));
@@ -223,5 +178,70 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
         driver.quit();
       }
     }
+  }
+
+  async* chooseSize(driver: ThenableWebDriver, size: string) {
+    let sizeButton = null;
+
+    try {
+      sizeButton = await driver.findElement(By.xpath(`//span[contains(@class, 'sizes-list__size') and text()='${size}']`));
+    } catch {}
+
+    if (sizeButton === null) {
+      throw new AddToCartUsecaseError(`size "${size}" is not found.`);
+    }
+
+    await sizeButton.click();
+    await driver.sleep(SECOND * 3);
+    yield createStepMessage(new Click(), `Choose size "${size}"`, await driver.takeScreenshot());
+  }
+
+  async* chooseAddress(driver: ThenableWebDriver, address: string) {
+    const addressLink = driver.findElement(By.className("simple-menu__link--address"));
+    await addressLink.click();
+    await driver.sleep(SECOND * 3);
+    yield createStepMessage(new Click(), "Click address link", await driver.takeScreenshot());
+
+    const addressInput = driver.findElement(By.css("input[class*='searchbox-input__input']"));
+    await addressInput.sendKeys(address);
+    await driver.sleep(SECOND);
+    yield createStepMessage(new SendKeys(address), "Send address to address input", await driver.takeScreenshot());
+
+    await addressInput.sendKeys(Key.RETURN);
+    await driver.sleep(SECOND * 5);
+    yield createStepMessage(new SendKeys(Key.RETURN), "Get suggested addresses", await driver.takeScreenshot());
+
+    let addressDropdownFirstItem = null;
+
+    try {
+      addressDropdownFirstItem = await driver.findElement(By.css("*[class$='islets_serp-popup']:not(*[class$='islets__hidden']) *[class$='islets__first']"));
+    } catch {
+    }
+
+    if (addressDropdownFirstItem !== null) {
+      await addressDropdownFirstItem.click();
+      await driver.sleep(SECOND * 3);
+      yield createStepMessage(new Click(), "Click dropdown first address item", await driver.takeScreenshot());
+    }
+
+    let addressItem = null;
+
+    try {
+      addressItem = await driver.findElement(By.xpath(`//span[text()='${address}']`));
+    } catch {
+    }
+
+    if (addressItem === null) {
+      throw new AddToCartUsecaseError(`address "${address}" is not found.`);
+    }
+
+    await addressItem.click();
+    await driver.sleep(SECOND * 2);
+    yield createStepMessage(new Click(), "Click address item", await driver.takeScreenshot());
+
+    const chooseAddressButton = driver.findElement(By.className("balloon-content-block-btn"));
+    await chooseAddressButton.click();
+    await driver.sleep(SECOND * 2);
+    yield createStepMessage(new Click(), "Choose address", await driver.takeScreenshot());
   }
 }
