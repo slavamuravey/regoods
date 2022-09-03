@@ -85,6 +85,18 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       await driver.sleep(SECOND * 5);
       yield createStepMessage(new SendKeys(Key.RETURN), "Get suggested addresses", await driver.takeScreenshot());
 
+      let addressDropdownFirstItem = null;
+
+      try {
+        addressDropdownFirstItem = await driver.findElement(By.css("*[class$='islets_serp-popup']:not(*[class$='islets__hidden']) *[class$='islets__first']"));
+      } catch {}
+
+      if (addressDropdownFirstItem !== null) {
+        await addressDropdownFirstItem.click();
+        await driver.sleep(SECOND * 3);
+        yield createStepMessage(new Click(), "Click dropdown first address item", await driver.takeScreenshot());
+      }
+
       let addressItem = null;
 
       try {
