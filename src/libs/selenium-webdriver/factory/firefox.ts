@@ -10,7 +10,7 @@ export class FirefoxDriverFactory implements DriverFactory {
   }
 
   create(): ThenableWebDriver {
-    const { headless, screen } = this.options;
+    const { headless } = this.options;
     const builder = new Builder();
     const options = new firefox.Options();
 
@@ -18,13 +18,13 @@ export class FirefoxDriverFactory implements DriverFactory {
       options.headless()
     }
 
-    if (screen) {
-      options.windowSize(screen);
-    }
-
     builder.forBrowser("firefox");
     builder.setFirefoxOptions(options);
 
-    return builder.build();
+    const driver = builder.build();
+
+    driver.manage().window().maximize();
+
+    return driver;
   }
 }

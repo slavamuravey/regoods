@@ -6,26 +6,31 @@
   "scripts": {
     "build": "tsc -b src",
     "cli": "npm run build && node build/cli.js",
-    "cli:dev": "node -r ts-node/register src/cli.ts"
+    "cli:dev": "node -r ts-node/register src/cli.ts",
+    "postinstall": "sed -i 's/cdc_/xxx_/g' ./node_modules/chromedriver/lib/chromedriver/chromedriver"
   },
   "keywords": [],
   "author": "slavamuravey",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
-    "chromedriver": "^103.0.0",
+    "chromedriver": "^105.0.0",
     "commander": "^9.4.0",
     "dotenv": "^16.0.1",
     "geckodriver": "^3.0.2",
+    "lodash": "^4.17.21",
     "luxon": "^3.0.1",
     "node-fetch": "^2.6.7",
-    "selenium-webdriver": "^4.3.1"
+    "selenium-webdriver": "^4.3.1",
+    "user-agents": "^1.0.1128"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.184",
     "@types/luxon": "^3.0.0",
     "@types/node": "^18.7.6",
     "@types/node-fetch": "^2.6.2",
     "@types/selenium-webdriver": "^4.1.2",
+    "@types/user-agents": "^1.0.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.7.4"
   }

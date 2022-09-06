@@ -5,20 +5,24 @@ import { createDriver } from "../../../libs/selenium-webdriver";
 import type { WbUserRepository } from "../../repository/wb-user";
 import type { ProfileParams, ProfileUsecase } from "../profile";
 import type { StepMessage } from "../step-message";
+import _ from "lodash";
+import { createUserAgentString } from "../user-agent";
 
 export class ProfileUsecaseImpl implements ProfileUsecase {
   constructor(readonly wbUserRepository: WbUserRepository) {
     this.wbUserRepository = wbUserRepository;
   }
 
-  async* profile({ wbUserId, browser, headless, quit}: ProfileParams): AsyncGenerator<StepMessage> {
+  async* profile({ wbUserId, browser, proxy, userAgent, headless, quit}: ProfileParams): AsyncGenerator<StepMessage> {
     const wbUserRepository = this.wbUserRepository;
 
-    const driver = createDriver(browser, { headless });
+    const userAgentString = typeof userAgent === "string" ? createUserAgentString(userAgent) : undefined;
+
+    const driver = createDriver(browser, { headless, proxy, userAgent: userAgentString });
 
     try {
       await driver.get("https://www.wildberries.ru");
-      await driver.sleep(SECOND);
+      await driver.sleep(_.random(SECOND, SECOND * 2));
       yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page", await driver.takeScreenshot());
 
       const wbUser = await wbUserRepository.find(wbUserId);

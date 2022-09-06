@@ -2,10 +2,8 @@ import { ThenableWebDriver } from "selenium-webdriver";
 
 export interface DriverOptions {
   headless?: boolean;
-  screen?: {
-    width: number;
-    height: number;
-  }
+  proxy?: string;
+  userAgent?: string;
 }
 
 export interface DriverFactory {

@@ -14,19 +14,12 @@ export class WbUserRepositoryImpl implements WbUserRepository {
       throw new WbUserNotFoundError(id);
     }
 
-    const result: WbUser = {
-      id
+    const cookies = await fs.promises.readFile(createCookiesFilePath(id), { encoding: "utf8" });
+
+    return {
+      id,
+      cookies: JSON.parse(cookies)
     };
-
-    let cookies;
-
-    try {
-      cookies = await fs.promises.readFile(createCookiesFilePath(id), { encoding: "utf8" });
-      result.cookies = JSON.parse(cookies);
-    } catch {
-    }
-
-    return result;
   }
 
   async create(payload: CreatePayload): Promise<WbUser> {
