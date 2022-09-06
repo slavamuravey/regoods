@@ -18,6 +18,8 @@ export class FirefoxDriverFactory implements DriverFactory {
       options.headless()
     }
 
+    options.windowSize({ width: 1920, height: 1080 });
+
     builder.forBrowser("firefox");
     builder.setFirefoxOptions(options);
 

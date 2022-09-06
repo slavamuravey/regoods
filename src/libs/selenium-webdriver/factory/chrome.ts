@@ -26,8 +26,9 @@ export class ChromeDriverFactory implements DriverFactory {
       options.addArguments(`--user-agent=${userAgent}`);
     }
 
+    options.windowSize({ width: 1920, height: 1080 });
+
     options.addArguments("--no-sandbox");
-    options.addArguments("--start-maximized");
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--disable-blink-features=AutomationControlled");
     options.addArguments("--disable-infobars");
