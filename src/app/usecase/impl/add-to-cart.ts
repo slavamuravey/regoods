@@ -4,45 +4,40 @@ import { SECOND } from "../../../libs/time";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import { AddToCartParams, AddToCartUsecase, AddToCartUsecaseError } from "../add-to-cart";
 import { By, Key, ThenableWebDriver } from "selenium-webdriver";
-import type { WbUserRepository } from "../../repository/wb-user";
+import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { StepMessage } from "../step-message";
 import _ from "lodash";
-import { createUserAgentString } from "../user-agent";
 
 export class AddToCartUsecaseImpl implements AddToCartUsecase {
-  constructor(readonly wbUserRepository: WbUserRepository) {
-    this.wbUserRepository = wbUserRepository;
+  constructor(readonly wbUserSessionRepository: WbUserSessionRepository) {
+    this.wbUserSessionRepository = wbUserSessionRepository;
   }
 
   async* addToCart({
-                     wbUserId,
+                     phone,
                      vendorCode,
                      keyPhrase,
                      size,
                      address,
                      browser,
                      proxy,
-                     userAgent,
                      headless,
                      quit
                    }: AddToCartParams): AsyncGenerator<StepMessage> {
-    const wbUserRepository = this.wbUserRepository;
+    const wbUserSessionRepository = this.wbUserSessionRepository;
 
-    const userAgentString = typeof userAgent === "string" ? createUserAgentString(userAgent) : undefined;
+    const wbUserSession = await wbUserSessionRepository.findOneByPhone(phone);
 
-    const driver = createDriver(browser, { headless, proxy, userAgent: userAgentString });
+    const { userAgent, id: sessionId } = wbUserSession;
+
+    const driver = createDriver(browser, { headless, proxy, userAgent });
 
     try {
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page", await driver.takeScreenshot());
 
-      const wbUser = await wbUserRepository.find(wbUserId);
-      const cookies = wbUser.cookies;
-
-      if (!cookies) {
-        throw new Error(`no cookies for user "${wbUserId}".`);
-      }
+      const cookies = wbUserSession.cookies;
 
       for (const cookie of cookies) {
         await driver.manage().addCookie(cookie);
@@ -83,7 +78,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
         const cookies = await getCookies(driver);
 
-        await wbUserRepository.update(wbUserId, { cookies });
+        await wbUserSessionRepository.update(sessionId, { cookies });
       }
 
       const searchInput = driver.findElement(By.id("searchInput"));
@@ -191,7 +186,8 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
     try {
       sizeButton = await driver.findElement(By.xpath(`//span[contains(@class, 'sizes-list__size') and text()='${size}']`));
-    } catch {}
+    } catch {
+    }
 
     if (sizeButton === null) {
       throw new AddToCartUsecaseError(`size "${size}" is not found.`);

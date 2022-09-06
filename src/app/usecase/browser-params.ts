@@ -3,5 +3,4 @@ export interface BrowserParams {
   headless?: boolean;
   quit: boolean;
   proxy?: string;
-  userAgent: string | boolean;
 }

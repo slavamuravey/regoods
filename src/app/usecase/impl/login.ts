@@ -4,37 +4,36 @@ import { LoginUsecaseError } from "../login";
 import { createStepMessage, getCookies } from "../utils";
 import { Click, CreateUser, Get, RentPhone, SendKeys } from "../actions";
 import { createDriver } from "../../../libs/selenium-webdriver";
-import type { WbUserRepository } from "../../repository/wb-user";
+import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { CodeReceiver } from "../../service/code-receiver";
 import type { PhoneRenter } from "../../service/phone-renter";
 import type { RandomNameGenerator } from "../../service/random-name-generator";
 import type { LoginParams, LoginUsecase } from "../login";
 import type { StepMessage } from "../step-message";
 import _ from "lodash";
-import { createUserAgentString } from "../user-agent";
+import UserAgent from "user-agents";
 
 export class LoginUsecaseImpl implements LoginUsecase {
   constructor(
-    readonly wbUserRepository: WbUserRepository,
+    readonly wbUserSessionRepository: WbUserSessionRepository,
     readonly codeReceiver: CodeReceiver,
     readonly phoneRenter: PhoneRenter,
     readonly randomNameGenerator: RandomNameGenerator
   ) {
-    this.wbUserRepository = wbUserRepository;
+    this.wbUserSessionRepository = wbUserSessionRepository;
     this.codeReceiver = codeReceiver;
     this.phoneRenter = phoneRenter;
     this.randomNameGenerator = randomNameGenerator;
   }
 
-  async* login({ wbUserId, gender, browser, proxy, userAgent, headless, quit}: LoginParams): AsyncGenerator<StepMessage> {
-    const wbUserRepository = this.wbUserRepository;
+  async* login({ phone, gender, browser, proxy, userAgent, headless, quit}: LoginParams): AsyncGenerator<StepMessage> {
+    const wbUserSessionRepository = this.wbUserSessionRepository;
     const codeReceiver = this.codeReceiver;
     const phoneRenter = this.phoneRenter;
     const randomNameGenerator = this.randomNameGenerator;
 
-    const userAgentString = typeof userAgent === "string" ? createUserAgentString(userAgent) : undefined;
-
-    const driver = createDriver(browser, { headless, proxy, userAgent: userAgentString });
+    const userAgentResolved = userAgent ? userAgent : String(new UserAgent({ deviceCategory: "desktop" }));
+    const driver = createDriver(browser, { headless, proxy, userAgent: userAgentResolved });
 
     try {
       await driver.get("https://www.wildberries.ru");
@@ -46,14 +45,14 @@ export class LoginUsecaseImpl implements LoginUsecase {
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield createStepMessage(new Click(), "Click login button", await driver.takeScreenshot());
 
-      let phone: string;
+      let phoneResolved: string;
 
-      if (!wbUserId) {
+      if (!phone) {
         const result = await phoneRenter.rent();
-        phone = result.phone;
-        yield createStepMessage(new RentPhone(phone), "Rent new phone number");
+        phoneResolved = result.phone;
+        yield createStepMessage(new RentPhone(phoneResolved), "Rent new phone number");
       } else {
-        phone = wbUserId;
+        phoneResolved = phone;
       }
 
       const phoneInput = driver.findElement(By.className("input-item"));
@@ -64,7 +63,7 @@ export class LoginUsecaseImpl implements LoginUsecase {
         yield createStepMessage(new SendKeys(Key.HOME), "Send HOME key to phone input", await driver.takeScreenshot());
       }
 
-      const phoneKeys = phone.slice(-10);
+      const phoneKeys = phoneResolved.slice(-10);
       await phoneInput.sendKeys(phoneKeys);
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield createStepMessage(new SendKeys(phoneKeys), "Send phone number keys to phone input", await driver.takeScreenshot());
@@ -74,7 +73,7 @@ export class LoginUsecaseImpl implements LoginUsecase {
       await driver.sleep(_.random(SECOND * 5, SECOND * 10));
       yield createStepMessage(new Click(), "Click request code button", await driver.takeScreenshot());
 
-      const code = await codeReceiver.receiveCode(phone);
+      const code = await codeReceiver.receiveCode(phoneResolved);
 
       const codeInput = driver.findElement(By.className("j-input-confirm-code"));
       await codeInput.sendKeys(code as string);
@@ -95,7 +94,7 @@ export class LoginUsecaseImpl implements LoginUsecase {
       }
 
       if (!isAccountEmpty) {
-        throw new LoginUsecaseError(`account "${phone}" is not empty.`);
+        throw new LoginUsecaseError(`account "${phoneResolved}" is not empty.`);
       }
 
       if (gender) {
@@ -130,8 +129,8 @@ export class LoginUsecaseImpl implements LoginUsecase {
 
       const cookies = await getCookies(driver);
 
-      await wbUserRepository.create({ id: phone, cookies });
-      yield createStepMessage(new CreateUser(phone, cookies), "Store user");
+      await wbUserSessionRepository.create({ phone: phoneResolved, cookies, userAgent: userAgentResolved });
+      yield createStepMessage(new CreateUser(phoneResolved, cookies), "Store user");
     } finally {
       if (quit) {
         driver.quit();

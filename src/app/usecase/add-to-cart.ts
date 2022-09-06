@@ -2,7 +2,7 @@ import type { StepMessage } from "./step-message";
 import type { BrowserParams } from "./browser-params";
 
 export interface AddToCartParams extends BrowserParams {
-  wbUserId: string;
+  phone: string;
   vendorCode: string;
   keyPhrase: string;
   size: string | boolean;

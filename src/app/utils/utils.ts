@@ -6,24 +6,52 @@ export function createSnapshotDirPath() {
   return path.resolve(ROOT_DIR, "data", "snapshot");
 }
 
-export async function createSnapshot(filePath: string, image: string) {
+export async function storeSnapshot(filePath: string, image: string) {
   await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, image, "base64");
 }
 
-export function createCookiesFilePath(userId: string): string {
-  return path.resolve(createUserIdDirPath(userId), "cookies.json");
+export function createCookiesFilePath(userId: string, sessionId: string): string {
+  return path.resolve(createUserSessionDirPath(userId, sessionId), "cookies.json");
 }
 
-export function createUserIdDirPath(userId: string): string {
-  return path.resolve(ROOT_DIR, "data", "wb-user", userId);
+export function createUserAgentFilePath(userId: string, sessionId: string): string {
+  return path.resolve(createUserSessionDirPath(userId, sessionId), "user-agent.txt");
+}
+
+export function createUserSessionDirPath(userId: string, sessionId: string): string {
+  return path.resolve(createUserSessionsDirPath(userId), sessionId);
+}
+
+export function createUserSessionsDirPath(userId: string): string {
+  return path.resolve(createUserDirPath(userId), "sessions");
+}
+
+export async function storeUserAgent(userId: string, sessionId: string, userAgent: string) {
+  const filePath = createUserAgentFilePath(userId, sessionId);
+  await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.promises.writeFile(filePath, userAgent);
+}
+
+export async function storeCookies(userId: string, sessionId: string, cookies: string) {
+  const filePath = createCookiesFilePath(userId, sessionId);
+  await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.promises.writeFile(filePath, cookies);
+}
+
+export function createUserDirPath(userId: string): string {
+  return path.resolve(createUsersDirPath(), userId);
+}
+
+export function createUsersDirPath(): string {
+  return path.resolve(ROOT_DIR, "data", "wb-user");
 }
 
 export function createSmsActiveDirPath(): string {
   return path.resolve(ROOT_DIR, "data", "sms-active");
 }
 
-export async function createSmsActiveRentId(number: string, rentId: string) {
+export async function storeSmsActiveRentId(number: string, rentId: string) {
   const filePath = createSmsActiveRentIdFilePath(number);
   await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
   await fs.promises.writeFile(filePath, rentId);

@@ -1,9 +1,8 @@
 import { Command, Option } from "commander";
 import { container } from "../app/service-container";
-import { AddToCartUsecaseError } from "../app/usecase/add-to-cart";
-import { USER_AGENT_RANDOM } from "../app/usecase/user-agent";
-import type { StepMessage } from "../app/usecase/step-message";
 import type { AddToCartUsecase } from "../app/usecase/add-to-cart";
+import { AddToCartUsecaseError } from "../app/usecase/add-to-cart";
+import type { StepMessage } from "../app/usecase/step-message";
 
 export const addToCartCmd = new Command();
 
@@ -33,26 +32,19 @@ addToCartCmd
   .addOption(
     new Option("--proxy <string>", "the ipv4 of a proxy server, ex. http://193.233.75.242:59100")
   )
-  .addOption(
-    new Option("--user-agent <string>", "a string that contains a specific user agent").default(USER_AGENT_RANDOM)
-  )
-  .addOption(
-    new Option("--no-user-agent <string>", "do not set any user agent")
-  )
   .addOption(new Option("--headless", "enable headless mode"))
   .addOption(new Option("--no-quit", "turn off quit on finish"))
-  .action(async ({ phone, vendorCode, keyPhrase, size, address, browser, proxy, userAgent, headless, quit }) => {
+  .action(async ({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit }) => {
     const addToCartUsecase: AddToCartUsecase = container.get("add-to-cart-usecase");
 
     const addToCartGenerator: AsyncGenerator<StepMessage> = addToCartUsecase.addToCart({
-      wbUserId: phone,
+      phone,
       vendorCode,
       keyPhrase,
       size,
       address,
       browser,
       proxy,
-      userAgent,
       headless,
       quit
     });

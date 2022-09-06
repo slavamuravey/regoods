@@ -3,7 +3,7 @@ import { SmsActivateClientFactory } from "./service/factory/sms-activate-client"
 import { RandomDataToolsClientFactory } from "./service/factory/random-data-tools-client";
 import { PhoneRenterFactory } from "./service/factory/phone-renter";
 import { RandomNameGeneratorFactory } from "./service/factory/random-name-generator";
-import { WbUserRepositoryFactory } from "./repository/factory/wb-user";
+import { WbUserSessionRepositoryFactory } from "./repository/factory/wb-user-session";
 import { LoginUsecaseFactory } from "./usecase/factory/login";
 import { ProfileUsecaseFactory } from "./usecase/factory/profile";
 import { AddToCartUsecaseFactory } from "./usecase/factory/add-to-cart";
@@ -21,8 +21,8 @@ spec.set("sms-activate-client", {
 spec.set("random-data-tools-client", {
   factory: new RandomDataToolsClientFactory()
 });
-spec.set("wb-user-repository", {
-  factory: new WbUserRepositoryFactory()
+spec.set("wb-user-session-repository", {
+  factory: new WbUserSessionRepositoryFactory()
 });
 spec.set("phone-renter", {
   factory: new PhoneRenterFactory()

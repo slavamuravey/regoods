@@ -1,7 +1,6 @@
 import { Command, Option } from "commander";
 import { container } from "../app/service-container";
 import { LoginUsecaseError } from "../app/usecase/login";
-import { USER_AGENT_RANDOM } from "../app/usecase/user-agent";
 import type { LoginParams, LoginUsecase } from "../app/usecase/login";
 import type { StepMessage } from "../app/usecase/step-message";
 
@@ -19,10 +18,7 @@ loginCmd
     new Option("--proxy <string>", "the ipv4 of a proxy server, ex. http://193.233.75.242:59100")
   )
   .addOption(
-    new Option("--user-agent <string>", "a string that contains a specific user agent").default(USER_AGENT_RANDOM)
-  )
-  .addOption(
-    new Option("--no-user-agent <string>", "do not set any user agent")
+    new Option("--user-agent <string>", "a string that contains a specific user agent")
   )
   .addOption(new Option("--headless", "enable headless mode"))
   .addOption(new Option("--no-quit", "turn off quit on finish"))
@@ -38,7 +34,7 @@ loginCmd
     };
 
     if (phone) {
-      params.wbUserId = phone;
+      params.phone = phone;
     }
 
     if (gender) {

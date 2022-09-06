@@ -1,11 +1,11 @@
 import { AddToCartUsecaseImpl } from "../impl/add-to-cart";
 import type { Container, ServiceFactory } from "../../../libs/service-container/types";
-import type { WbUserRepository } from "../../repository/wb-user";
+import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 
 export class AddToCartUsecaseFactory implements ServiceFactory {
   create(container: Container): AddToCartUsecaseImpl {
-    const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
+    const wbUserSessionRepository: WbUserSessionRepository = container.get("wb-user-session-repository");
 
-    return new AddToCartUsecaseImpl(wbUserRepository);
+    return new AddToCartUsecaseImpl(wbUserSessionRepository);
   }
 }

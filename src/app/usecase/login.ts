@@ -4,8 +4,9 @@ import type { BrowserParams } from "./browser-params";
 export type Gender = "man" | "woman";
 
 export interface LoginParams extends BrowserParams {
-  wbUserId?: string;
+  phone?: string;
   gender?: Gender;
+  userAgent?: string;
 }
 
 export interface LoginUsecase {
