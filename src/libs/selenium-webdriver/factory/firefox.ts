@@ -23,10 +23,6 @@ export class FirefoxDriverFactory implements DriverFactory {
     builder.forBrowser("firefox");
     builder.setFirefoxOptions(options);
 
-    const driver = builder.build();
-
-    driver.manage().window().maximize();
-
-    return driver;
+    return builder.build();
   }
 }
