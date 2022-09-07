@@ -4,6 +4,10 @@ export interface DriverOptions {
   headless?: boolean;
   proxy?: string;
   userAgent?: string;
+  windowSize?: {
+    width: number;
+    height: number;
+  }
 }
 
 export interface DriverFactory {

@@ -10,7 +10,7 @@ export class FirefoxDriverFactory implements DriverFactory {
   }
 
   create(): ThenableWebDriver {
-    const { headless } = this.options;
+    const { headless, windowSize } = this.options;
     const builder = new Builder();
     const options = new firefox.Options();
 
@@ -18,7 +18,9 @@ export class FirefoxDriverFactory implements DriverFactory {
       options.headless()
     }
 
-    options.windowSize({ width: 1920, height: 1080 });
+    if (windowSize) {
+      options.windowSize(windowSize);
+    }
 
     builder.forBrowser("firefox");
     builder.setFirefoxOptions(options);
