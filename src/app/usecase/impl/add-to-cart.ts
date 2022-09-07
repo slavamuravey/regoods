@@ -99,6 +99,9 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
         }
 
         if (item !== null) {
+          await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth' });", item);
+          await driver.sleep(_.random(SECOND, SECOND * 2));
+
           await item.click();
           await driver.sleep(_.random(SECOND * 2, SECOND * 4));
           yield createStepMessage(new Click(), `Open item with vendor code "${vendorCode}"`, await driver.takeScreenshot());
@@ -116,6 +119,14 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
           throw new AddToCartUsecaseError(`product with vendor code "${vendorCode}" is not found.`);
         }
 
+        const footer = await driver.findElement(By.css("footer"));
+        await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth' });", footer);
+        await driver.sleep(_.random(SECOND, SECOND * 2));
+
+        const pager = await driver.findElement(By.className("pager-bottom"));
+        await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth' });", pager);
+        await driver.sleep(_.random(SECOND, SECOND * 2));
+
         await nextPageLink.click();
         await driver.sleep(_.random(SECOND * 2, SECOND * 4));
         yield createStepMessage(new Click(), "Click next page link", await driver.takeScreenshot());
@@ -126,7 +137,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       }
 
       const detailsHeader = driver.findElement(By.className("details-section__header"));
-      await driver.executeScript("arguments[0].scrollIntoView(true);", detailsHeader);
+      await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth' });", detailsHeader);
       await driver.sleep(_.random(SECOND * 3, SECOND * 6));
       yield createStepMessage(new Click(), "Scroll to details section", await driver.takeScreenshot());
 
@@ -242,7 +253,14 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
     yield createStepMessage(new Click(), "Click address item", await driver.takeScreenshot());
 
     const chooseAddressButton = driver.findElement(By.className("balloon-content-block-btn"));
-    await chooseAddressButton.click();
+
+    if (await chooseAddressButton.getAttribute("disabled") === "true") {
+      const closeButton = driver.findElement(By.className("popup__close-btn"));
+      await closeButton.click();
+    } else {
+      await chooseAddressButton.click();
+    }
+
     await driver.sleep(_.random(SECOND * 2, SECOND * 4));
     yield createStepMessage(new Click(), "Choose address", await driver.takeScreenshot());
   }
