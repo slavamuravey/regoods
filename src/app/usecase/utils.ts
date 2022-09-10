@@ -1,12 +1,10 @@
-import type { Action, StepMessage } from "./step-message";
+import type { StepMessage } from "./step-message";
 import type { ThenableWebDriver } from "selenium-webdriver";
 import type { IWebDriverCookie } from "selenium-webdriver";
 
-export function createStepMessage(action: Action, description: string, screenshot?: string): StepMessage {
+export function createStepMessage(description: string): StepMessage {
   return {
-    action,
     description,
-    screenshot
   }
 }
 

@@ -33,10 +33,7 @@ profileCmd
 
     try {
       for await (const msg of profileGenerator) {
-        console.log({
-          ...msg,
-          screenshot: msg.screenshot?.slice(-10)
-        });
+        console.log(msg);
       }
     } catch (e) {
       if (e instanceof ProfileUsecaseError) {

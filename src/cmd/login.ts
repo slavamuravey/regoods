@@ -45,10 +45,7 @@ loginCmd
 
     try {
       for await (const msg of loginGenerator) {
-        console.log({
-          ...msg,
-          screenshot: msg.screenshot?.slice(-10)
-        });
+        console.log(msg);
       }
     } catch (e) {
       if (e instanceof LoginUsecaseError) {

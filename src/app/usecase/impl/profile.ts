@@ -1,5 +1,4 @@
 import { createStepMessage } from "../utils";
-import { Get } from "../actions";
 import { SECOND } from "../../../libs/time";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
@@ -24,7 +23,7 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
     try {
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page", await driver.takeScreenshot());
+      yield createStepMessage("Open main page");
 
       const wbUser = await wbUserSessionRepository.findOneByPhone(phone);
       const cookies = wbUser.cookies;
@@ -35,7 +34,7 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
 
       await driver.get("https://www.wildberries.ru/lk");
       await driver.sleep(SECOND);
-      yield createStepMessage(new Get("https://www.wildberries.ru/lk"), "Open profile page", await driver.takeScreenshot());
+      yield createStepMessage("Open profile page");
     } finally {
       if (quit) {
         driver.quit();

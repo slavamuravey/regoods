@@ -51,10 +51,7 @@ addToCartCmd
 
     try {
       for await (const msg of addToCartGenerator) {
-        console.log({
-          ...msg,
-          screenshot: msg.screenshot?.slice(-10)
-        });
+        console.log(msg);
       }
     } catch (e) {
       if (e instanceof AddToCartUsecaseError) {

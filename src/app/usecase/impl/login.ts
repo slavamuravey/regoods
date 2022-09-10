@@ -2,7 +2,6 @@ import { By, Key } from "selenium-webdriver";
 import { SECOND } from "../../../libs/time";
 import { LoginUsecaseError } from "../login";
 import { createStepMessage, getCookies } from "../utils";
-import { Click, CreateUser, Get, RentPhone, SendKeys } from "../actions";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { CodeReceiver } from "../../service/code-receiver";
@@ -38,19 +37,19 @@ export class LoginUsecaseImpl implements LoginUsecase {
     try {
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page", await driver.takeScreenshot());
+      yield createStepMessage("Open main page");
 
       const loginLink = driver.findElement(By.className("j-main-login"));
       await loginLink.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click login button", await driver.takeScreenshot());
+      yield createStepMessage("Click login button");
 
       let phoneResolved: string;
 
       if (!phone) {
         const result = await phoneRenter.rent();
         phoneResolved = result.phone;
-        yield createStepMessage(new RentPhone(phoneResolved), "Rent new phone number");
+        yield createStepMessage("Rent new phone number");
       } else {
         phoneResolved = phone;
       }
@@ -60,29 +59,29 @@ export class LoginUsecaseImpl implements LoginUsecase {
       if (browser === "chrome") {
         await phoneInput.sendKeys(Key.HOME);
         await driver.sleep(_.random(SECOND, SECOND * 2));
-        yield createStepMessage(new SendKeys(Key.HOME), "Send HOME key to phone input", await driver.takeScreenshot());
+        yield createStepMessage("Send HOME key to phone input");
       }
 
       const phoneKeys = phoneResolved.slice(-10);
       await phoneInput.sendKeys(phoneKeys);
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new SendKeys(phoneKeys), "Send phone number keys to phone input", await driver.takeScreenshot());
+      yield createStepMessage("Send phone number keys to phone input");
 
       const requestCodeButton = driver.findElement(By.id("requestCode"));
       await requestCodeButton.click();
       await driver.sleep(_.random(SECOND * 5, SECOND * 10));
-      yield createStepMessage(new Click(), "Click request code button", await driver.takeScreenshot());
+      yield createStepMessage("Click request code button");
 
       const code = await codeReceiver.receiveCode(phoneResolved);
 
       const codeInput = driver.findElement(By.className("j-input-confirm-code"));
       await codeInput.sendKeys(code as string);
       await driver.sleep(_.random(SECOND * 3, SECOND * 6));
-      yield createStepMessage(new SendKeys(code as string), "Send code keys to code input", await driver.takeScreenshot());
+      yield createStepMessage("Send code keys to code input");
 
       await driver.get("https://www.wildberries.ru/lk/details");
       await driver.sleep(_.random(SECOND * 3, SECOND * 6));
-      yield createStepMessage(new Get("https://www.wildberries.ru/lk/details"), "Open profile details", await driver.takeScreenshot());
+      yield createStepMessage("Open profile details");
 
       let isAccountEmpty: boolean;
 
@@ -102,35 +101,35 @@ export class LoginUsecaseImpl implements LoginUsecase {
         const genderRadioButtonIndex = gender === "man" ? 0 : 1;
         await genderRadioButton[genderRadioButtonIndex].click();
         await driver.sleep(_.random(SECOND, SECOND * 2));
-        yield createStepMessage(new Click(), "Click gender radio button", await driver.takeScreenshot());
+        yield createStepMessage("Click gender radio button");
       }
 
       const editNameButton = driver.findElement(By.className("btn-edit"));
       await editNameButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click edit name button", await driver.takeScreenshot());
+      yield createStepMessage("Click edit name button");
 
       const name = await randomNameGenerator.generate(gender);
 
       const lastNameInput = driver.findElement(By.id("Item.LastName"));
       await lastNameInput.clear();
       await lastNameInput.sendKeys(name.lastName);
-      yield createStepMessage(new SendKeys(name.lastName), "Send last name to last name input", await driver.takeScreenshot());
+      yield createStepMessage("Send last name to last name input");
 
       const firstNameInput = driver.findElement(By.id("Item.FirstName"));
       await firstNameInput.clear();
       await firstNameInput.sendKeys(name.firstName);
-      yield createStepMessage(new SendKeys(name.firstName), "Send first name to first name input", await driver.takeScreenshot());
+      yield createStepMessage("Send first name to first name input");
 
       const saveNameButton = driver.findElement(By.className("btn-main"));
       await saveNameButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click save name button", await driver.takeScreenshot());
+      yield createStepMessage("Click save name button");
 
       const cookies = await getCookies(driver);
 
       await wbUserSessionRepository.create({ phone: phoneResolved, cookies, userAgent: userAgentResolved });
-      yield createStepMessage(new CreateUser(phoneResolved, cookies), "Store user");
+      yield createStepMessage("Store user");
     } finally {
       if (quit) {
         driver.quit();

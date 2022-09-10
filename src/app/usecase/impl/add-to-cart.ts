@@ -1,5 +1,4 @@
 import { createStepMessage, getCookies } from "../utils";
-import { Click, Get, SendKeys } from "../actions";
 import { SECOND } from "../../../libs/time";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import { AddToCartParams, AddToCartUsecase, AddToCartUsecaseError } from "../add-to-cart";
@@ -35,7 +34,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
     try {
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page", await driver.takeScreenshot());
+      yield createStepMessage("Open main page");
 
       const cookies = wbUserSession.cookies;
 
@@ -45,12 +44,12 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page as logged in user", await driver.takeScreenshot());
+      yield createStepMessage("Open main page as logged in user");
 
       const basketButton = driver.findElement(By.className("j-item-basket"));
       await basketButton.click();
       await driver.sleep(_.random(SECOND * 2, SECOND * 4));
-      yield createStepMessage(new Click(), "Click basket button", await driver.takeScreenshot());
+      yield createStepMessage("Click basket button");
 
       while (true) {
         let removeItemButton = null;
@@ -66,12 +65,12 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
         await removeItemButton.click();
         await driver.sleep(_.random(SECOND, SECOND * 2));
-        yield createStepMessage(new Click(), "Remove item from the cart", await driver.takeScreenshot());
+        yield createStepMessage("Remove item from the cart");
       }
 
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Get("https://www.wildberries.ru"), "Open main page after clean basket", await driver.takeScreenshot());
+      yield createStepMessage("Open main page after clean basket");
 
       if (typeof address === "string") {
         yield* this.chooseAddress(driver, address);
@@ -84,11 +83,11 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       const searchInput = driver.findElement(By.id("searchInput"));
       await searchInput.sendKeys(keyPhrase);
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new SendKeys(keyPhrase), "Send key phrase keys to search input", await driver.takeScreenshot());
+      yield createStepMessage("Send key phrase keys to search input");
 
       await searchInput.sendKeys(Key.RETURN);
       await driver.sleep(_.random(SECOND * 5, SECOND * 10));
-      yield createStepMessage(new SendKeys(Key.RETURN), "Get search results", await driver.takeScreenshot());
+      yield createStepMessage("Get search results");
 
       while (true) {
         let item = null;
@@ -104,7 +103,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
           await item.click();
           await driver.sleep(_.random(SECOND * 2, SECOND * 4));
-          yield createStepMessage(new Click(), `Open item with vendor code "${vendorCode}"`, await driver.takeScreenshot());
+          yield createStepMessage(`Open item with vendor code "${vendorCode}"`);
           break;
         }
 
@@ -129,7 +128,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
         await nextPageLink.click();
         await driver.sleep(_.random(SECOND * 2, SECOND * 4));
-        yield createStepMessage(new Click(), "Click next page link", await driver.takeScreenshot());
+        yield createStepMessage("Click next page link");
       }
 
       if (typeof size === "string") {
@@ -139,22 +138,22 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       const detailsHeader = driver.findElement(By.className("details-section__header"));
       await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth' });", detailsHeader);
       await driver.sleep(_.random(SECOND * 3, SECOND * 6));
-      yield createStepMessage(new Click(), "Scroll to details section", await driver.takeScreenshot());
+      yield createStepMessage("Scroll to details section");
 
       const openCharacteristicsButton = driver.findElement(By.className("collapsible__toggle"));
       await openCharacteristicsButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Open characteristics", await driver.takeScreenshot());
+      yield createStepMessage("Open characteristics");
 
       const addToCartButton = driver.findElement(By.css("a.btn-main"));
       await addToCartButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click add to cart button", await driver.takeScreenshot());
+      yield createStepMessage("Click add to cart button");
 
       const cartButton = driver.findElement(By.css("a.btn-base"));
       await cartButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click cart button", await driver.takeScreenshot());
+      yield createStepMessage("Click cart button");
 
       let choosePayButton = null;
 
@@ -169,22 +168,22 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
       await choosePayButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click choose pay method button", await driver.takeScreenshot());
+      yield createStepMessage("Click choose pay method button");
 
       const qrMethodButton = driver.findElement(By.className("icon-qrc"));
       await qrMethodButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click QR pay method button", await driver.takeScreenshot());
+      yield createStepMessage("Click QR pay method button");
 
       const popupChooseButton = driver.findElement(By.className("popup__btn-main"));
       await popupChooseButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click popup choose button", await driver.takeScreenshot());
+      yield createStepMessage("Click popup choose button");
 
       const doOrderButton = driver.findElement(By.className("b-btn-do-order"));
       await doOrderButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage(new Click(), "Click do order button", await driver.takeScreenshot());
+      yield createStepMessage("Click do order button");
     } finally {
       if (quit) {
         driver.quit();
@@ -206,23 +205,23 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
     await sizeButton.click();
     await driver.sleep(_.random(SECOND * 3, SECOND * 6));
-    yield createStepMessage(new Click(), `Choose size "${size}"`, await driver.takeScreenshot());
+    yield createStepMessage(`Choose size "${size}"`);
   }
 
   async* chooseAddress(driver: ThenableWebDriver, address: string) {
     const addressLink = driver.findElement(By.className("simple-menu__link--address"));
     await addressLink.click();
     await driver.sleep(_.random(SECOND * 3, SECOND * 6));
-    yield createStepMessage(new Click(), "Click address link", await driver.takeScreenshot());
+    yield createStepMessage("Click address link");
 
     const addressInput = driver.findElement(By.css("input[class*='searchbox-input__input']"));
     await addressInput.sendKeys(address);
     await driver.sleep(_.random(SECOND, SECOND * 2));
-    yield createStepMessage(new SendKeys(address), "Send address to address input", await driver.takeScreenshot());
+    yield createStepMessage("Send address to address input");
 
     await addressInput.sendKeys(Key.RETURN);
     await driver.sleep(_.random(SECOND * 5, SECOND * 10));
-    yield createStepMessage(new SendKeys(Key.RETURN), "Get suggested addresses", await driver.takeScreenshot());
+    yield createStepMessage("Get suggested addresses");
 
     let addressDropdownFirstItem = null;
 
@@ -234,7 +233,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
     if (addressDropdownFirstItem !== null) {
       await addressDropdownFirstItem.click();
       await driver.sleep(_.random(SECOND * 3, SECOND * 6));
-      yield createStepMessage(new Click(), "Click dropdown first address item", await driver.takeScreenshot());
+      yield createStepMessage("Click dropdown first address item");
     }
 
     let addressItem = null;
@@ -250,7 +249,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
     await addressItem.click();
     await driver.sleep(_.random(SECOND * 2, SECOND * 4));
-    yield createStepMessage(new Click(), "Click address item", await driver.takeScreenshot());
+    yield createStepMessage("Click address item");
 
     const chooseAddressButton = driver.findElement(By.className("balloon-content-block-btn"));
 
@@ -262,6 +261,6 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
     }
 
     await driver.sleep(_.random(SECOND * 2, SECOND * 4));
-    yield createStepMessage(new Click(), "Choose address", await driver.takeScreenshot());
+    yield createStepMessage("Choose address");
   }
 }
