@@ -49,7 +49,7 @@ export class LoginUsecaseImpl implements LoginUsecase {
       if (!phone) {
         const result = await phoneRenter.rent();
         phoneResolved = result.phone;
-        yield createStepMessage("Rent new phone number");
+        yield createStepMessage(`Rent new phone number "${phoneResolved}"`);
       } else {
         phoneResolved = phone;
       }

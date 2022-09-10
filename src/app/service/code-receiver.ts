@@ -1,3 +1,3 @@
 export interface CodeReceiver {
-  receiveCode(phone: string): Promise<string | unknown>;
+  receiveCode(phone: string): Promise<string>;
 }
