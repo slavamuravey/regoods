@@ -14,6 +14,8 @@ export class ChromeDriverFactory implements DriverFactory {
     const builder = new Builder();
     const options = new chrome.Options();
 
+    options.get("goog:chromeOptions").useAutomationExtension = false;
+
     if (headless) {
       options.headless()
     }
@@ -40,6 +42,33 @@ export class ChromeDriverFactory implements DriverFactory {
     builder.forBrowser("chrome");
     builder.setChromeOptions(options);
 
-    return builder.build();
+    const driver = builder.build();
+
+    (async () => {
+      // const caps = await driver.getCapabilities();
+      // console.log(caps.get("goog:chromeOptions").debuggerAddress);
+
+      const connection = await driver.createCDPConnection("page");
+
+      await connection.execute("Page.enable", {}, null);
+      await connection.execute("Page.addScriptToEvaluateOnNewDocument", {
+        source: `
+            Object.defineProperty(navigator, "plugins", {
+              get: () => [1, 2, 3, 4, 5]
+            });
+            const originalQuery = window.navigator.permissions.query;
+            window.navigator.permissions.query = (parameters) => (
+              parameters.name === 'notifications' ?
+                Promise.resolve({ state: Notification.permission }) :
+                originalQuery(parameters)
+            );
+            window.chrome = {
+              runtime: {}
+            };
+          `
+      });
+    })();
+
+    return driver;
   }
 }
