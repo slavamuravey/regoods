@@ -48,6 +48,8 @@ addToCartCmd
         }
 
         console.error("internal error: ", err);
+
+        return;
       }
 
       console.log(msg);
