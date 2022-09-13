@@ -9,7 +9,7 @@ import fs from "fs";
     client = await CDP({
       port: 9222
     });
-    const { Network, Page } = client;
+    const { Page } = client;
 
     await Page.enable();
 

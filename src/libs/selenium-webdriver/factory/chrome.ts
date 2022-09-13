@@ -45,9 +45,6 @@ export class ChromeDriverFactory implements DriverFactory {
     const driver = builder.build();
 
     (async () => {
-      // const caps = await driver.getCapabilities();
-      // console.log(caps.get("goog:chromeOptions").debuggerAddress);
-
       const connection = await driver.createCDPConnection("page");
 
       await connection.execute("Page.enable", {}, null);

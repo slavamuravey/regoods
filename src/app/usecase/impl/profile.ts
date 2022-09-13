@@ -1,10 +1,10 @@
-import { createStepMessage } from "../utils";
 import { SECOND } from "../../../libs/time";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { ProfileParams, ProfileUsecase } from "../profile";
 import type { StepMessage } from "../step-message";
 import _ from "lodash";
+import { BrowserActionNotification } from "../step-message";
 
 export class ProfileUsecaseImpl implements ProfileUsecase {
   constructor(readonly wbUserSessionRepository: WbUserSessionRepository) {
@@ -23,7 +23,7 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
     try {
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield createStepMessage("Open main page");
+      yield new BrowserActionNotification("Open main page");
 
       const wbUser = await wbUserSessionRepository.findOneByPhone(phone);
       const cookies = wbUser.cookies;
@@ -34,7 +34,7 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
 
       await driver.get("https://www.wildberries.ru/lk");
       await driver.sleep(SECOND);
-      yield createStepMessage("Open profile page");
+      yield new BrowserActionNotification("Open profile page");
     } finally {
       if (quit) {
         driver.quit();

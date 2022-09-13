@@ -1,12 +1,5 @@
-import type { StepMessage } from "./step-message";
 import type { ThenableWebDriver } from "selenium-webdriver";
 import type { IWebDriverCookie } from "selenium-webdriver";
-
-export function createStepMessage(description: string): StepMessage {
-  return {
-    description,
-  }
-}
 
 export async function getCookies(driver: ThenableWebDriver) {
   const cookies = await driver.manage().getCookies();

@@ -2,15 +2,6 @@ import path from "path";
 import fs from "fs";
 import { ROOT_DIR } from "../../settings";
 
-export function createSnapshotDirPath() {
-  return path.resolve(ROOT_DIR, "data", "snapshot");
-}
-
-export async function storeSnapshot(filePath: string, image: string) {
-  await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, image, "base64");
-}
-
 export function createCookiesFilePath(userId: string, sessionId: string): string {
   return path.resolve(createUserSessionDirPath(userId, sessionId), "cookies.json");
 }

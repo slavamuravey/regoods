@@ -1,8 +1,8 @@
 import { Command, Option } from "commander";
-import { container } from "../app/service-container";
-import type { AddToCartUsecase } from "../app/usecase/add-to-cart";
+import { fork } from "child_process";
+import path from "path";
+import { NeedStopProcessStepMessageType, StepMessage } from "../app/usecase/step-message";
 import { AddToCartUsecaseError } from "../app/usecase/add-to-cart";
-import type { StepMessage } from "../app/usecase/step-message";
 
 export const addToCartCmd = new Command();
 
@@ -35,31 +35,25 @@ addToCartCmd
   .addOption(new Option("--headless", "enable headless mode"))
   .addOption(new Option("--no-quit", "turn off quit on finish"))
   .action(async ({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit }) => {
-    const addToCartUsecase: AddToCartUsecase = container.get("add-to-cart-usecase");
+    const child = fork(path.resolve(__dirname, "../app/worker/add-to-cart"));
+    child.send({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit });
+    child.on("message", (data: { msg: StepMessage | null, err: Error | null }) => {
+      const { msg, err } = data;
 
-    const addToCartGenerator: AsyncGenerator<StepMessage> = addToCartUsecase.addToCart({
-      phone,
-      vendorCode,
-      keyPhrase,
-      size,
-      address,
-      browser,
-      proxy,
-      headless,
-      quit
+      if (err) {
+        if (err instanceof AddToCartUsecaseError) {
+          console.error(err);
+
+          return;
+        }
+
+        console.error("internal error: ", err);
+      }
+
+      console.log(msg);
+
+      if (msg!.type === NeedStopProcessStepMessageType) {
+        process.kill(child.pid!, "SIGSTOP");
+      }
     });
-
-    try {
-      for await (const msg of addToCartGenerator) {
-        console.log(msg);
-      }
-    } catch (e) {
-      if (e instanceof AddToCartUsecaseError) {
-        console.log(e);
-
-        return;
-      }
-
-      console.log("internal error: ", e);
-    }
   });
