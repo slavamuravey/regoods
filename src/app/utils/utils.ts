@@ -50,7 +50,8 @@ export function createScreencastDirPath() {
   return path.resolve(createDataDirPath(), "screencast");
 }
 
-export async function storeScreencast(filePath: string, image: string) {
+export async function storeScreencastFrame(screencastId: string, screencastFrameFileName: string, image: string) {
+  const filePath = path.resolve(createScreencastDirPath(), screencastId, screencastFrameFileName);
   await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, image, "base64");
 }

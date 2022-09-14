@@ -1,8 +1,7 @@
 import CDP from "chrome-remote-interface";
 import Protocol from "devtools-protocol";
 import { v4 as uuid } from "uuid";
-import { createScreencastDirPath, storeScreencast } from "../utils/utils";
-import path from "path";
+import { storeScreencastFrame } from "../utils/utils";
 
 process.on("message", async ({ debuggerAddress }) => {
   let client: CDP.Client;
@@ -28,7 +27,7 @@ process.on("message", async ({ debuggerAddress }) => {
 
       counter++;
 
-      await storeScreencast(path.resolve(createScreencastDirPath(), screencastId, `screen-${counter}.png`), data);
+      await storeScreencastFrame(screencastId, `screencast-frame-${counter}.png`, data);
     });
     client.on("disconnect", async () => {
       console.log("disconnected");
