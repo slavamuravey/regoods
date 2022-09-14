@@ -11,7 +11,7 @@ import type { LoginParams, LoginUsecase } from "../login";
 import type { StepMessage } from "../step-message";
 import _ from "lodash";
 import UserAgent from "user-agents";
-import { BrowserActionNotification } from "../step-message";
+import { BrowserActionNotification, DebuggerAddressNotification } from "../step-message";
 
 export class LoginUsecaseImpl implements LoginUsecase {
   constructor(
@@ -36,6 +36,13 @@ export class LoginUsecaseImpl implements LoginUsecase {
     const driver = createDriver(browser, { headless, proxy, userAgent: userAgentResolved });
 
     try {
+      if (browser === "chrome") {
+        const caps = await driver.getCapabilities();
+        yield new DebuggerAddressNotification("Debugger address", {
+          debuggerAddress: caps.get("goog:chromeOptions").debuggerAddress
+        });
+      }
+
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield new BrowserActionNotification("Open main page");

@@ -6,7 +6,6 @@ import {
   NeedStopProcessStepMessageType,
   StepMessage
 } from "../app/usecase/step-message";
-import { AddToCartUsecaseError } from "../app/usecase/add-to-cart";
 
 export const addToCartCmd = new Command();
 
@@ -41,30 +40,14 @@ addToCartCmd
   .action(async ({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit }) => {
     const child = fork(path.resolve(__dirname, "../app/worker/add-to-cart"));
     child.send({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit });
-    child.on("message", (data: { msg: StepMessage | null, err: Error | null }) => {
-      const { msg, err } = data;
-
-      if (err) {
-        if (err instanceof AddToCartUsecaseError) {
-          console.error(err);
-
-          return;
-        }
-
-        console.error("internal error: ", err);
-
-        return;
-      }
-
-      console.log(msg);
-
-      if (msg!.type === NeedStopProcessStepMessageType) {
+    child.on("message", (msg: StepMessage) => {
+      if (msg.type === NeedStopProcessStepMessageType) {
         process.kill(child.pid!, "SIGSTOP");
       }
 
-      if (msg!.type === DebuggerAddressNotificationStepMessageType) {
+      if (msg.type === DebuggerAddressNotificationStepMessageType) {
         const screencast = fork(path.resolve(__dirname, "../app/worker/screencast"));
-        screencast.send({ debuggerAddress: msg!.data.debuggerAddress });
+        screencast.send({ debuggerAddress: msg.data.debuggerAddress });
       }
     });
   });

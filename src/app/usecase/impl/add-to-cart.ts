@@ -33,10 +33,12 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
     const driver = createDriver(browser, { headless, proxy, userAgent });
 
     try {
-      const caps = await driver.getCapabilities();
-      yield new DebuggerAddressNotification("Debugger address", {
-        debuggerAddress: caps.get("goog:chromeOptions").debuggerAddress
-      });
+      if (browser === "chrome") {
+        const caps = await driver.getCapabilities();
+        yield new DebuggerAddressNotification("Debugger address", {
+          debuggerAddress: caps.get("goog:chromeOptions").debuggerAddress
+        });
+      }
 
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));

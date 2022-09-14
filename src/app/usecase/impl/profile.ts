@@ -4,7 +4,7 @@ import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { ProfileParams, ProfileUsecase } from "../profile";
 import type { StepMessage } from "../step-message";
 import _ from "lodash";
-import { BrowserActionNotification } from "../step-message";
+import { BrowserActionNotification, DebuggerAddressNotification } from "../step-message";
 
 export class ProfileUsecaseImpl implements ProfileUsecase {
   constructor(readonly wbUserSessionRepository: WbUserSessionRepository) {
@@ -21,6 +21,13 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
     const driver = createDriver(browser, { headless, proxy, userAgent });
 
     try {
+      if (browser === "chrome") {
+        const caps = await driver.getCapabilities();
+        yield new DebuggerAddressNotification("Debugger address", {
+          debuggerAddress: caps.get("goog:chromeOptions").debuggerAddress
+        });
+      }
+
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield new BrowserActionNotification("Open main page");

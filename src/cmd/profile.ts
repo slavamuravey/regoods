@@ -37,11 +37,11 @@ profileCmd
       }
     } catch (e) {
       if (e instanceof ProfileUsecaseError) {
-        console.log(e);
+        console.error(e);
 
         return;
       }
 
-      console.log("internal error: ", e);
+      console.error("internal error: ", e);
     }
   });
