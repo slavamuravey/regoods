@@ -23,5 +23,7 @@ process.on("message", async ({ phone, vendorCode, keyPhrase, size, address, brow
     }
   } catch (err) {
     process.send!({ msg: null, err});
+  } finally {
+    process.exit();
   }
 });

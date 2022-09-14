@@ -37,7 +37,7 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
       yield new BrowserActionNotification("Open profile page");
     } finally {
       if (quit) {
-        driver.quit();
+        await driver.quit();
       }
     }
   }

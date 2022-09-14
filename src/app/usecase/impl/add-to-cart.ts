@@ -194,7 +194,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       yield new BrowserActionNotification("Click do order button");
     } finally {
       if (quit) {
-        driver.quit();
+        await driver.quit();
       }
     }
   }

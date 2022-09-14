@@ -133,7 +133,7 @@ export class LoginUsecaseImpl implements LoginUsecase {
       yield new BrowserActionNotification("Store user");
     } finally {
       if (quit) {
-        driver.quit();
+        await driver.quit();
       }
     }
   }

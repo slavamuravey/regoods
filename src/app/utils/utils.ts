@@ -35,11 +35,24 @@ export function createUserDirPath(userId: string): string {
 }
 
 export function createUsersDirPath(): string {
-  return path.resolve(ROOT_DIR, "data", "wb-user");
+  return path.resolve(createDataDirPath(), "wb-user");
 }
 
 export function createSmsActiveDirPath(): string {
-  return path.resolve(ROOT_DIR, "data", "sms-active");
+  return path.resolve(createDataDirPath(), "sms-active");
+}
+
+export function createDataDirPath(): string {
+  return path.resolve(ROOT_DIR, "data");
+}
+
+export function createScreencastDirPath() {
+  return path.resolve(createDataDirPath(), "screencast");
+}
+
+export async function storeScreencast(filePath: string, image: string) {
+  await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, image, "base64");
 }
 
 export async function storeSmsActiveRentId(number: string, rentId: string) {

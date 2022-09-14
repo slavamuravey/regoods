@@ -1,7 +1,11 @@
 import { Command, Option } from "commander";
 import { fork } from "child_process";
 import path from "path";
-import { NeedStopProcessStepMessageType, StepMessage } from "../app/usecase/step-message";
+import {
+  DebuggerAddressNotificationStepMessageType,
+  NeedStopProcessStepMessageType,
+  StepMessage
+} from "../app/usecase/step-message";
 import { AddToCartUsecaseError } from "../app/usecase/add-to-cart";
 
 export const addToCartCmd = new Command();
@@ -56,6 +60,11 @@ addToCartCmd
 
       if (msg!.type === NeedStopProcessStepMessageType) {
         process.kill(child.pid!, "SIGSTOP");
+      }
+
+      if (msg!.type === DebuggerAddressNotificationStepMessageType) {
+        const screencast = fork(path.resolve(__dirname, "../app/worker/screencast"));
+        screencast.send({ debuggerAddress: msg!.data.debuggerAddress });
       }
     });
   });
