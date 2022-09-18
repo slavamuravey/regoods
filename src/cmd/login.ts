@@ -47,6 +47,8 @@ loginCmd
 
       if (msg.type === DebuggerAddressNotificationStepMessageType) {
         const screencast = fork(path.resolve(__dirname, "../app/worker/screencast"), { silent: true });
+        screencast.stdout!.pipe(logStdoutStream);
+        screencast.stderr!.pipe(logStderrStream);
         screencast.send({ debuggerAddress: msg.data.debuggerAddress });
       }
     });
