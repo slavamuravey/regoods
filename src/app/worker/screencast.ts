@@ -30,10 +30,11 @@ process.on("message", async ({ debuggerAddress }) => {
       await storeScreencastFrame(screencastId, `screencast-frame-${counter}.png`, data);
     });
     client.on("disconnect", async () => {
-      console.log("disconnected");
+      process.send!({ msg: "disconnected", err: null });
       process.exit();
     });
   } catch (err) {
-    console.error(err);
+    process.send!({ msg: null, err });
+    process.exit();
   }
 });

@@ -1,7 +1,6 @@
 import { container } from "../service-container";
-import { LoginUsecaseError } from "../usecase/login";
-import type { StepMessage } from "../usecase/step-message";
 import type { LoginParams, LoginUsecase } from "../usecase/login";
+import type { StepMessage } from "../usecase/step-message";
 
 process.on("message", async ({ phone, gender, browser, proxy, userAgent, headless, quit }) => {
   const loginUsecase: LoginUsecase = container.get("login-usecase");
@@ -26,17 +25,23 @@ process.on("message", async ({ phone, gender, browser, proxy, userAgent, headles
 
   try {
     for await (const msg of loginGenerator) {
-      console.log(msg);
-      process.send!(msg);
+      process.send!({ msg, err: null });
     }
   } catch (e) {
-    if (e instanceof LoginUsecaseError) {
-      console.error(e);
+    if (e instanceof Error) {
+      process.send!({
+        msg: null,
+        err: {
+          name: e.name,
+          message: e.message,
+          stack: e.stack
+        }
+      });
 
       return;
     }
 
-    console.error("internal error: ", e);
+    throw e;
   } finally {
     process.exit();
   }

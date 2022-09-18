@@ -1,5 +1,4 @@
 import { container } from "../service-container";
-import { AddToCartUsecaseError } from "../usecase/add-to-cart";
 import type { AddToCartUsecase } from "../usecase/add-to-cart";
 import type { StepMessage } from "../usecase/step-message";
 
@@ -20,17 +19,23 @@ process.on("message", async ({ phone, vendorCode, keyPhrase, size, address, brow
 
   try {
     for await (const msg of addToCartGenerator) {
-      console.log(msg);
-      process.send!(msg);
+      process.send!({ msg, err: null });
     }
   } catch (e) {
-    if (e instanceof AddToCartUsecaseError) {
-      console.error(e);
+    if (e instanceof Error) {
+      process.send!({
+        msg: null,
+        err: {
+          name: e.name,
+          message: e.message,
+          stack: e.stack
+        }
+      });
 
       return;
     }
 
-    console.error("internal error: ", e);
+    throw e;
   } finally {
     process.exit();
   }
