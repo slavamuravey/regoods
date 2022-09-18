@@ -6,7 +6,7 @@ import {
   createUserSessionsDirPath,
   storeCookies,
   storeUserAgent
-} from "../../utils/utils";
+} from "../../../utils/utils";
 import type {
   WbUserSessionCreatePayload,
   WbUserSessionRepository,

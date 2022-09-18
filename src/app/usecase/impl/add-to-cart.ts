@@ -5,12 +5,14 @@ import { AddToCartParams, AddToCartUsecase, AddToCartUsecaseError } from "../add
 import { By, Key, ThenableWebDriver } from "selenium-webdriver";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { StepMessage } from "../step-message";
+import type { ProxyResolver } from "../../service/proxy-resolver";
 import _ from "lodash";
 import { BrowserActionNotification, DebuggerAddressNotification, NeedStopProcess } from "../step-message";
 
 export class AddToCartUsecaseImpl implements AddToCartUsecase {
-  constructor(readonly wbUserSessionRepository: WbUserSessionRepository) {
+  constructor(readonly wbUserSessionRepository: WbUserSessionRepository, readonly proxyResolver: ProxyResolver) {
     this.wbUserSessionRepository = wbUserSessionRepository;
+    this.proxyResolver = proxyResolver;
   }
 
   async* addToCart({
@@ -30,7 +32,11 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
     const { userAgent, id: sessionId } = wbUserSession;
 
-    const driver = createDriver(browser, { headless, proxy, userAgent });
+    const driver = createDriver(browser, {
+      headless,
+      proxy: proxy === undefined ? await this.proxyResolver.resolve() : proxy,
+      userAgent
+    });
 
     try {
       if (browser === "chrome") {

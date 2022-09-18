@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { ROOT_DIR } from "../../settings";
+import { ROOT_DIR } from "../settings";
 
 export function createCookiesFilePath(userId: string, sessionId: string): string {
   return path.resolve(createUserSessionDirPath(userId, sessionId), "cookies.json");
@@ -64,4 +64,12 @@ export async function storeSmsActiveRentId(number: string, rentId: string) {
 
 export function createSmsActiveRentIdFilePath(number: string) {
   return path.resolve(createSmsActiveDirPath(), `${number}.txt`);
+}
+
+export function createLogDirPath(): string {
+  return path.resolve(ROOT_DIR, "log");
+}
+
+export function createProxyFilePath(): string {
+  return path.resolve(createDataDirPath(), "proxy.txt");
 }

@@ -9,6 +9,7 @@ import type { PhoneRenter } from "../../service/phone-renter";
 import type { RandomNameGenerator } from "../../service/random-name-generator";
 import type { LoginParams, LoginUsecase } from "../login";
 import type { StepMessage } from "../step-message";
+import type { ProxyResolver } from "../../service/proxy-resolver";
 import _ from "lodash";
 import UserAgent from "user-agents";
 import { BrowserActionNotification, DebuggerAddressNotification } from "../step-message";
@@ -18,12 +19,14 @@ export class LoginUsecaseImpl implements LoginUsecase {
     readonly wbUserSessionRepository: WbUserSessionRepository,
     readonly codeReceiver: CodeReceiver,
     readonly phoneRenter: PhoneRenter,
-    readonly randomNameGenerator: RandomNameGenerator
+    readonly randomNameGenerator: RandomNameGenerator,
+    readonly proxyResolver: ProxyResolver
   ) {
     this.wbUserSessionRepository = wbUserSessionRepository;
     this.codeReceiver = codeReceiver;
     this.phoneRenter = phoneRenter;
     this.randomNameGenerator = randomNameGenerator;
+    this.proxyResolver = proxyResolver;
   }
 
   async* login({ phone, gender, browser, proxy, userAgent, headless, quit}: LoginParams): AsyncGenerator<StepMessage> {
@@ -33,7 +36,11 @@ export class LoginUsecaseImpl implements LoginUsecase {
     const randomNameGenerator = this.randomNameGenerator;
 
     const userAgentResolved = userAgent ? userAgent : String(new UserAgent({ deviceCategory: "desktop" }));
-    const driver = createDriver(browser, { headless, proxy, userAgent: userAgentResolved });
+    const driver = createDriver(browser, {
+      headless,
+      proxy: proxy === undefined ? await this.proxyResolver.resolve() : proxy,
+      userAgent: userAgentResolved
+    });
 
     try {
       if (browser === "chrome") {

@@ -1,7 +1,7 @@
 import CDP from "chrome-remote-interface";
 import Protocol from "devtools-protocol";
 import { v4 as uuid } from "uuid";
-import { storeScreencastFrame } from "../utils/utils";
+import { storeScreencastFrame } from "../../utils/utils";
 
 process.on("message", async ({ debuggerAddress }) => {
   let client: CDP.Client;

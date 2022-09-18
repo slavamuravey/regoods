@@ -4,6 +4,8 @@ import { RandomDataToolsClientFactory } from "./service/factory/random-data-tool
 import { PhoneRenterFactory } from "./service/factory/phone-renter";
 import { RandomNameGeneratorFactory } from "./service/factory/random-name-generator";
 import { WbUserSessionRepositoryFactory } from "./repository/factory/wb-user-session";
+import { ProxyRepositoryFactory } from "./repository/factory/proxy";
+import { ProxyResolverFactory } from "./service/factory/proxy-resolver";
 import { LoginUsecaseFactory } from "./usecase/factory/login";
 import { ProfileUsecaseFactory } from "./usecase/factory/profile";
 import { AddToCartUsecaseFactory } from "./usecase/factory/add-to-cart";
@@ -24,11 +26,17 @@ spec.set("random-data-tools-client", {
 spec.set("wb-user-session-repository", {
   factory: new WbUserSessionRepositoryFactory()
 });
+spec.set("proxy-repository", {
+  factory: new ProxyRepositoryFactory()
+});
 spec.set("phone-renter", {
   factory: new PhoneRenterFactory()
 });
 spec.set("random-name-generator", {
   factory: new RandomNameGeneratorFactory()
+});
+spec.set("proxy-resolver", {
+  factory: new ProxyResolverFactory()
 });
 spec.set("login-usecase", {
   factory: new LoginUsecaseFactory()

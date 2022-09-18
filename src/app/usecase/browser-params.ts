@@ -2,5 +2,5 @@ export interface BrowserParams {
   browser: "chrome" | "firefox";
   headless?: boolean;
   quit: boolean;
-  proxy?: string;
+  proxy: string | boolean;
 }

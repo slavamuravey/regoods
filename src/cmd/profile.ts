@@ -18,6 +18,7 @@ profileCmd
   .addOption(
     new Option("--proxy <string>", "the ipv4 of a proxy server, ex. http://193.233.75.242:59100")
   )
+  .addOption(new Option("--no-proxy", "do not use proxy"))
   .addOption(new Option("--headless", "enable headless mode"))
   .addOption(new Option("--no-quit", "turn off quit on finish"))
   .action(async ({ phone, browser, proxy, headless, quit }) => {

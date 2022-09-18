@@ -3,12 +3,14 @@ import { createDriver } from "../../../libs/selenium-webdriver";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { ProfileParams, ProfileUsecase } from "../profile";
 import type { StepMessage } from "../step-message";
+import type { ProxyResolver } from "../../service/proxy-resolver";
 import _ from "lodash";
 import { BrowserActionNotification, DebuggerAddressNotification } from "../step-message";
 
 export class ProfileUsecaseImpl implements ProfileUsecase {
-  constructor(readonly wbUserSessionRepository: WbUserSessionRepository) {
+  constructor(readonly wbUserSessionRepository: WbUserSessionRepository, readonly proxyResolver: ProxyResolver) {
     this.wbUserSessionRepository = wbUserSessionRepository;
+    this.proxyResolver = proxyResolver;
   }
 
   async* profile({ phone, browser, proxy, headless, quit}: ProfileParams): AsyncGenerator<StepMessage> {
@@ -18,7 +20,11 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
 
     const { userAgent } = wbUserSession;
 
-    const driver = createDriver(browser, { headless, proxy, userAgent });
+    const driver = createDriver(browser, {
+      headless,
+      proxy: proxy === undefined ? await this.proxyResolver.resolve() : proxy,
+      userAgent
+    });
 
     try {
       if (browser === "chrome") {

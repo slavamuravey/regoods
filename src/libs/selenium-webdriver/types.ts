@@ -2,7 +2,7 @@ import { ThenableWebDriver } from "selenium-webdriver";
 
 export interface DriverOptions {
   headless?: boolean;
-  proxy?: string;
+  proxy: string | boolean;
   userAgent?: string;
   windowSize?: {
     width: number;

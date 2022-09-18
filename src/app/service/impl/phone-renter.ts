@@ -1,6 +1,6 @@
 import type { PhoneRenter, RentResult } from "../phone-renter";
 import type { Client } from "../../../libs/sms-activate/types";
-import { storeSmsActiveRentId } from "../../utils/utils";
+import { storeSmsActiveRentId } from "../../../utils/utils";
 
 export class PhoneRenterImpl implements PhoneRenter {
   constructor(readonly smsActivateClient: Client) {
