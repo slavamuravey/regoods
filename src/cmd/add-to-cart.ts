@@ -1,14 +1,5 @@
 import { Command, Option } from "commander";
-import { fork } from "child_process";
-import path from "path";
-import type { StepMessage } from "../app/usecase/step-message";
-import {
-  DebuggerAddressNotificationStepMessageType,
-  NeedStopProcessStepMessageType
-} from "../app/usecase/step-message";
-import fs from "fs";
-import { createLogDirPath } from "../utils/utils";
-import { AddToCartUsecaseError } from "../app/usecase/add-to-cart";
+import { run } from "../app/worker/add-to-cart";
 
 export const addToCartCmd = new Command();
 
@@ -44,58 +35,5 @@ addToCartCmd
   .action(async ({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit }) => {
     console.log("process pid: ", process.pid);
 
-    const child = fork(path.resolve(__dirname, "../app/worker/add-to-cart"), { silent: true });
-
-    const createLogStdoutStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${process.pid}-${child.pid}-add-to-cart-stdout.log`), { flags: "a" });
-    const createLogStderrStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${process.pid}-${child.pid}-add-to-cart-stderr.log`), { flags: "a" });
-
-    const logStdoutStream = createLogStdoutStream();
-    const logStderrStream = createLogStderrStream();
-
-    process.stdout.isTTY = false;
-    process.stderr.isTTY = false;
-    // @ts-ignore
-    process.stdout.write = logStdoutStream.write.bind(logStdoutStream);
-    // @ts-ignore
-    process.stderr.write = logStderrStream.write.bind(logStderrStream);
-
-    child.stdout!.pipe(logStdoutStream);
-    child.stderr!.pipe(logStderrStream);
-
-    child.send({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit });
-    child.on("message", ({ msg, err }: { msg: StepMessage | null, err: Error | null }) => {
-      if (err !== null) {
-        if (err.name === AddToCartUsecaseError.name) {
-          console.error(err);
-        } else {
-          console.error("internal error: ", err);
-        }
-
-        return;
-      }
-
-      console.log(msg);
-
-      if (msg?.type === NeedStopProcessStepMessageType) {
-        process.kill(child.pid!, "SIGSTOP");
-      }
-
-      if (msg?.type === DebuggerAddressNotificationStepMessageType) {
-        const screencast = fork(path.resolve(__dirname, "../app/worker/screencast"), { silent: true });
-        const logStdoutStream = createLogStdoutStream();
-        const logStderrStream = createLogStderrStream();
-        screencast.stdout!.pipe(logStdoutStream);
-        screencast.stderr!.pipe(logStderrStream);
-        screencast.send({ debuggerAddress: msg.data.debuggerAddress });
-        screencast.on("message", ({ msg, err }: { msg: string | null, err: Error | null }) => {
-          if (err !== null) {
-            console.error("screencast error: ", err);
-
-            return;
-          }
-
-          console.log("screencast message: ", msg);
-        });
-      }
-    });
+    run({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit })
   });
