@@ -38,3 +38,21 @@ export class BrowserActionNotification implements StepMessage {
     this.description = description;
   }
 }
+
+export const DeliveryItemNotificationStepMessageType = "delivery-item-notification";
+
+export interface DeliveryItem {
+  address: string;
+  code: string;
+  status: string;
+  vendorCode: string;
+}
+
+export class DeliveryItemNotification implements StepMessage {
+  type = DeliveryItemNotificationStepMessageType;
+
+  constructor(readonly description: string, readonly data: DeliveryItem) {
+    this.description = description;
+    this.data = data;
+  }
+}

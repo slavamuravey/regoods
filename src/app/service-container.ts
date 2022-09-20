@@ -8,6 +8,7 @@ import { ProxyRepositoryFactory } from "./repository/factory/proxy";
 import { ProxyResolverFactory } from "./service/factory/proxy-resolver";
 import { LoginUsecaseFactory } from "./usecase/factory/login";
 import { ProfileUsecaseFactory } from "./usecase/factory/profile";
+import { CodeUsecaseFactory } from "./usecase/factory/code";
 import { AddToCartUsecaseFactory } from "./usecase/factory/add-to-cart";
 import { Container } from "../libs/service-container";
 import type { ServiceSpec } from "../libs/service-container/types";
@@ -43,6 +44,9 @@ spec.set("login-usecase", {
 });
 spec.set("profile-usecase", {
   factory: new ProfileUsecaseFactory()
+});
+spec.set("code-usecase", {
+  factory: new CodeUsecaseFactory()
 });
 spec.set("add-to-cart-usecase", {
   factory: new AddToCartUsecaseFactory()

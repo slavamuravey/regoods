@@ -14,9 +14,7 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
   }
 
   async* profile({ phone, browser, proxy, headless, quit}: ProfileParams): AsyncGenerator<StepMessage> {
-    const wbUserSessionRepository = this.wbUserSessionRepository;
-
-    const wbUserSession = await wbUserSessionRepository.findOneByPhone(phone);
+    const wbUserSession = await this.wbUserSessionRepository.findOneByPhone(phone);
 
     const { userAgent } = wbUserSession;
 
@@ -38,15 +36,14 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield new BrowserActionNotification("Open main page");
 
-      const wbUser = await wbUserSessionRepository.findOneByPhone(phone);
-      const cookies = wbUser.cookies;
+      const cookies = wbUserSession.cookies;
 
       for (const cookie of cookies) {
         await driver.manage().addCookie(cookie);
       }
 
       await driver.get("https://www.wildberries.ru/lk");
-      await driver.sleep(SECOND);
+      await driver.sleep(_.random(SECOND, SECOND * 2));
       yield new BrowserActionNotification("Open profile page");
     } finally {
       if (quit) {
