@@ -74,11 +74,12 @@ export class CodeUsecaseImpl implements CodeUsecase {
 
           const vendorCode = await driver.findElement(By.id("productNmId")).getText();
 
-          const close = await driver.findElement(By.className("popup__close close"));
+          const close = await driver.findElement(By.className("popup__close"));
           await close.click();
           await driver.sleep(_.random(SECOND, SECOND * 2));
 
           yield new DeliveryItemNotification("Found delivery item", {
+            phone,
             address,
             code,
             status,

@@ -7,6 +7,7 @@ import type { StepMessage } from "../usecase/step-message";
 import { CodeUsecaseError } from "../usecase/code";
 import { createLogDirPath } from "../../utils/utils";
 import { DebuggerAddressNotificationStepMessageType, NeedStopProcessStepMessageType } from "../usecase/step-message";
+import type { WorkerRunResponse } from "./worker";
 
 process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
   const codeUsecase: CodeUsecase = container.get("code-usecase");
@@ -34,7 +35,7 @@ process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
 export interface CodeRunPayload extends CodeParams {
 }
 
-export function run({ phone, browser, proxy, headless, quit }: CodeRunPayload) {
+export function run({ phone, browser, proxy, headless, quit }: CodeRunPayload): WorkerRunResponse {
   const child = fork(__filename, { silent: true });
 
   const createLogStdoutStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${process.pid}-${child.pid}-code-stdout.log`), { flags: "a" });
@@ -56,4 +57,13 @@ export function run({ phone, browser, proxy, headless, quit }: CodeRunPayload) {
       screencast.send({ debuggerAddress: msg.data.debuggerAddress });
     }
   });
+
+  return {
+    pid: child.pid!,
+    result: new Promise((resolve, reject) => {
+      child.on("exit", (code) => {
+        code === 0 ? resolve(code) : reject(code);
+      });
+    })
+  };
 }

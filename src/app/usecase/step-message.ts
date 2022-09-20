@@ -42,6 +42,7 @@ export class BrowserActionNotification implements StepMessage {
 export const DeliveryItemNotificationStepMessageType = "delivery-item-notification";
 
 export interface DeliveryItem {
+  phone: string;
   address: string;
   code: string;
   status: string;
