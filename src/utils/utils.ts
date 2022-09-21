@@ -73,3 +73,7 @@ export function createLogDirPath(): string {
 export function createProxyFilePath(): string {
   return path.resolve(createDataDirPath(), "proxy.txt");
 }
+
+export function createDeliveryCodesFilePath(): string {
+  return path.resolve(createDataDirPath(), "codes.csv");
+}

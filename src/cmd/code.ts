@@ -3,6 +3,8 @@ import { run } from "../app/worker/code";
 import { container } from "../app/service-container";
 import { WbUserRepository } from "../app/repository/wb-user";
 import { Locker } from "../libs/locker";
+import fs from "fs";
+import { createDeliveryCodesFilePath } from "../utils/utils";
 
 export const codeCmd = new Command();
 
@@ -22,17 +24,26 @@ codeCmd
   .addOption(new Option("--no-proxy", "do not use proxy"))
   .addOption(new Option("--headless", "enable headless mode"))
   .addOption(new Option("--no-quit", "turn off quit on finish"))
-  .action(async ({ phone, workersCount, browser, proxy, headless, quit }) => {
+  .addOption(new Option("--screencast", "enable screencast"))
+  .action(async ({ phone, workersCount, browser, proxy, headless, quit, screencast }) => {
     console.log("process pid: ", process.pid);
 
     if (phone) {
-      const { pid, result } = run({ phone, browser, proxy, headless, quit });
+      const { pid, result } = run({ phone, browser, proxy, headless, quit, screencast });
 
       const code = await result;
       console.log(`child ${pid} finished with code ${code}`);
 
       return;
     }
+
+    await fs.promises.writeFile(createDeliveryCodesFilePath(), [
+      "phone",
+      "address",
+      "code",
+      "status",
+      "vendorCode"
+    ].join(",") + "\n");
 
     const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
     const wbUsers = await wbUserRepository.findAll();
@@ -46,7 +57,7 @@ codeCmd
 
       await locker.getPromise();
 
-      const { pid, result } = run({ phone: wbUser.phone, browser, proxy, headless, quit });
+      const { pid, result } = run({ phone: wbUser.phone, browser, proxy, headless, quit, screencast });
       workersCount--;
 
       result.then(code => {

@@ -5,8 +5,12 @@ import { container } from "../service-container";
 import type { CodeUsecase, CodeParams } from "../usecase/code";
 import type { StepMessage } from "../usecase/step-message";
 import { CodeUsecaseError } from "../usecase/code";
-import { createLogDirPath } from "../../utils/utils";
-import { DebuggerAddressNotificationStepMessageType, NeedStopProcessStepMessageType } from "../usecase/step-message";
+import { createDeliveryCodesFilePath, createLogDirPath } from "../../utils/utils";
+import {
+  DebuggerAddressNotificationStepMessageType,
+  DeliveryItemNotification,
+  NeedStopProcessStepMessageType
+} from "../usecase/step-message";
 import type { WorkerRunResponse } from "./worker";
 
 process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
@@ -17,6 +21,18 @@ process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
   try {
     for await (const msg of codeGenerator) {
       console.log(msg);
+
+      if (msg instanceof DeliveryItemNotification) {
+        const { data: { phone, address, code, status, vendorCode } } = msg;
+        await fs.promises.appendFile(createDeliveryCodesFilePath(), [
+          `"${phone}"`,
+          `"${address}"`,
+          `"${code}"`,
+          `"${status}"`,
+          `"${vendorCode}"`
+        ].join(",") + "\n");
+      }
+
       process.send!(msg);
     }
   } catch (e) {
@@ -35,7 +51,7 @@ process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
 export interface CodeRunPayload extends CodeParams {
 }
 
-export function run({ phone, browser, proxy, headless, quit }: CodeRunPayload): WorkerRunResponse {
+export function run({ phone, browser, proxy, headless, quit, screencast }: CodeRunPayload): WorkerRunResponse {
   const child = fork(__filename, { silent: true });
 
   const createLogStdoutStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${process.pid}-${child.pid}-code-stdout.log`), { flags: "a" });
@@ -51,10 +67,12 @@ export function run({ phone, browser, proxy, headless, quit }: CodeRunPayload): 
     }
 
     if (msg.type === DebuggerAddressNotificationStepMessageType) {
-      const screencast = fork(path.resolve(__dirname, "./screencast"), { silent: true });
-      screencast.stdout!.pipe(createLogStdoutStream());
-      screencast.stderr!.pipe(createLogStderrStream());
-      screencast.send({ debuggerAddress: msg.data.debuggerAddress });
+      if (screencast) {
+        const screencast = fork(path.resolve(__dirname, "./screencast"), { silent: true });
+        screencast.stdout!.pipe(createLogStdoutStream());
+        screencast.stderr!.pipe(createLogStderrStream());
+        screencast.send({ debuggerAddress: msg.data.debuggerAddress });
+      }
     }
   });
 

@@ -1,7 +1,8 @@
 import type { StepMessage } from "./step-message";
 import type { BrowserParams } from "./browser-params";
+import type { ScreencastParams } from "./screencast-params";
 
-export interface CodeParams extends BrowserParams {
+export interface CodeParams extends BrowserParams, ScreencastParams {
   phone: string;
 }
 
