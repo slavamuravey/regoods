@@ -8,7 +8,7 @@ import { CodeUsecaseError } from "../usecase/code";
 import { createDeliveryCodesFilePath, createLogDirPath } from "../../utils/utils";
 import {
   DebuggerAddressNotificationStepMessageType,
-  DeliveryItemNotification,
+  DeliveryItemNotificationStepMessageType,
   NeedStopProcessStepMessageType
 } from "../usecase/step-message";
 import type { WorkerRunResponse } from "./worker";
@@ -21,18 +21,6 @@ process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
   try {
     for await (const msg of codeGenerator) {
       console.log(msg);
-
-      if (msg instanceof DeliveryItemNotification) {
-        const { data: { phone, address, code, status, vendorCode } } = msg;
-        await fs.promises.appendFile(createDeliveryCodesFilePath(), [
-          `"${phone}"`,
-          `"${address}"`,
-          `"${code}"`,
-          `"${status}"`,
-          `"${vendorCode}"`
-        ].join(",") + "\n");
-      }
-
       process.send!(msg);
     }
   } catch (e) {
@@ -61,7 +49,7 @@ export function run({ phone, browser, proxy, headless, quit, screencast }: CodeR
   child.stderr!.pipe(createLogStderrStream());
 
   child.send({ phone, browser, proxy, headless, quit });
-  child.on("message", (msg: StepMessage) => {
+  child.on("message", async (msg: StepMessage) => {
     if (msg.type === NeedStopProcessStepMessageType) {
       process.kill(child.pid!, "SIGSTOP");
     }
@@ -73,6 +61,17 @@ export function run({ phone, browser, proxy, headless, quit, screencast }: CodeR
         screencast.stderr!.pipe(createLogStderrStream());
         screencast.send({ debuggerAddress: msg.data.debuggerAddress });
       }
+    }
+
+    if (msg.type === DeliveryItemNotificationStepMessageType) {
+      const { data: { phone, address, code, status, vendorCode } } = msg;
+      await fs.promises.appendFile(createDeliveryCodesFilePath(), [
+        `"${phone}"`,
+        `"${address}"`,
+        `"${code}"`,
+        `"${status}"`,
+        `"${vendorCode}"`
+      ].join(",") + "\n");
     }
   });
 
