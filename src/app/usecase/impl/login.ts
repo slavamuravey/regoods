@@ -126,10 +126,11 @@ export class LoginUsecaseImpl implements LoginUsecase {
 
       const name = await randomNameGenerator.generate(gender);
 
-      const lastNameInput = driver.findElement(By.id("Item.LastName"));
-      await lastNameInput.clear();
-      await lastNameInput.sendKeys(name.lastName);
-      yield new BrowserActionNotification("Send last name to last name input");
+      // WB requires only first name now. Uncomment if WB will require last name again.
+      // const lastNameInput = driver.findElement(By.id("Item.LastName"));
+      // await lastNameInput.clear();
+      // await lastNameInput.sendKeys(name.lastName);
+      // yield new BrowserActionNotification("Send last name to last name input");
 
       const firstNameInput = driver.findElement(By.id("Item.FirstName"));
       await firstNameInput.clear();

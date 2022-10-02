@@ -39,6 +39,9 @@ export class ProfileUsecaseImpl implements ProfileUsecase {
       const cookies = wbUserSession.cookies;
 
       for (const cookie of cookies) {
+        if (![".wildberries.ru", "www.wildberries.ru"].includes(cookie.domain as string)) {
+          continue;
+        }
         await driver.manage().addCookie(cookie);
       }
 
