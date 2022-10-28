@@ -42,8 +42,8 @@ export interface CodeRunPayload extends CodeParams {
 export function run({ phone, browser, proxy, headless, quit, screencast }: CodeRunPayload): WorkerRunResponse {
   const child = fork(__filename, { silent: true });
 
-  const createLogStdoutStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${process.pid}-${child.pid}-code-stdout.log`), { flags: "a" });
-  const createLogStderrStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${process.pid}-${child.pid}-code-stderr.log`), { flags: "a" });
+  const createLogStdoutStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${phone}-${process.pid}-${child.pid}-code-stdout.log`), { flags: "a" });
+  const createLogStderrStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${phone}-${process.pid}-${child.pid}-code-stderr.log`), { flags: "a" });
 
   child.stdout!.pipe(createLogStdoutStream());
   child.stderr!.pipe(createLogStderrStream());
@@ -59,7 +59,7 @@ export function run({ phone, browser, proxy, headless, quit, screencast }: CodeR
         const screencast = fork(path.resolve(__dirname, "./screencast"), { silent: true });
         screencast.stdout!.pipe(createLogStdoutStream());
         screencast.stderr!.pipe(createLogStderrStream());
-        screencast.send({ debuggerAddress: msg.data.debuggerAddress });
+        screencast.send({ phone, debuggerAddress: msg.data.debuggerAddress });
       }
     }
 

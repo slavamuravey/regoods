@@ -3,7 +3,7 @@ import Protocol from "devtools-protocol";
 import { v4 as uuid } from "uuid";
 import { storeScreencastFrame } from "../../utils/utils";
 
-process.on("message", async ({ debuggerAddress }) => {
+process.on("message", async ({ phone, debuggerAddress }) => {
   let client: CDP.Client;
 
   try {
@@ -17,13 +17,13 @@ process.on("message", async ({ debuggerAddress }) => {
 
     await Page.enable();
 
-    await Page.startScreencast({ format: 'png', everyNthFrame: 1, quality: 100, maxWidth: 1280, maxHeight: 720 });
+    await Page.startScreencast({ format: "png", everyNthFrame: 1, quality: 100, maxWidth: 1280, maxHeight: 720 });
 
     let counter = 0;
-    const screencastId = uuid();
+    const screencastId = `${phone}-${uuid()}`;
 
     Page.on("screencastFrame", async ({ data, metadata, sessionId }: Protocol.Page.ScreencastFrameEvent) => {
-      await Page.screencastFrameAck({sessionId: sessionId});
+      await Page.screencastFrameAck({ sessionId: sessionId });
 
       counter++;
 

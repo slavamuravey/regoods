@@ -28,14 +28,9 @@ codeCmd
   .action(async ({ phone, workersCount, browser, proxy, headless, quit, screencast }) => {
     console.log("process pid: ", process.pid);
 
-    if (phone) {
-      const { pid, result } = run({ phone, browser, proxy, headless, quit, screencast });
-
-      const code = await result;
-      console.log(`child ${pid} finished with code ${code}`);
-
-      return;
-    }
+    const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
+    const phones = phone ? [phone] : (await wbUserRepository.findAll()).map(wbUser => wbUser.phone);
+    const locker = new Locker();
 
     await fs.promises.writeFile(createDeliveryCodesFilePath(), [
       "phone",
@@ -45,19 +40,14 @@ codeCmd
       "vendorCode"
     ].join(",") + "\n");
 
-    const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
-    const wbUsers = await wbUserRepository.findAll();
-
-    const locker = new Locker();
-
-    for (const wbUser of wbUsers) {
+    for (const phone of phones) {
       if (workersCount === 0) {
         locker.lock();
       }
 
       await locker.getPromise();
 
-      const { pid, result } = run({ phone: wbUser.phone, browser, proxy, headless, quit, screencast });
+      const { pid, result } = run({ phone, browser, proxy, headless, quit, screencast });
       workersCount--;
 
       result.then(code => {

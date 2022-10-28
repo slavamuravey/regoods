@@ -5,8 +5,9 @@ import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { StepMessage } from "../step-message";
 import { BrowserActionNotification, DebuggerAddressNotification, DeliveryItemNotification } from "../step-message";
 import type { ProxyResolver } from "../../service/proxy-resolver";
+import { By, until } from "selenium-webdriver";
+import { createWait } from "../utils";
 import _ from "lodash";
-import { By } from "selenium-webdriver";
 
 export class CodeUsecaseImpl implements CodeUsecase {
   constructor(
@@ -27,6 +28,7 @@ export class CodeUsecaseImpl implements CodeUsecase {
       proxy: proxy === undefined ? await this.proxyResolver.resolve() : proxy,
       userAgent
     });
+    const wait = createWait(driver, SECOND * 30);
 
     try {
       if (browser === "chrome") {
@@ -50,7 +52,7 @@ export class CodeUsecaseImpl implements CodeUsecase {
       }
 
       await driver.get("https://www.wildberries.ru/lk/myorders/delivery");
-      await driver.sleep(_.random(SECOND, SECOND * 2));
+      await driver.sleep(_.random(SECOND * 2, SECOND * 3));
       yield new BrowserActionNotification("Open delivery page");
 
       const deliveryAddresses = await driver.findElements(By.className("delivery-block__content"));
@@ -72,12 +74,16 @@ export class CodeUsecaseImpl implements CodeUsecase {
 
           const photo = await deliveryItem.findElement(By.className("goods-list-delivery__photo"));
           await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth' });", photo);
+          await driver.sleep(_.random(SECOND, SECOND * 2));
           await photo.click();
+
+          const vendorCodeElement = await wait(until.elementLocated(By.id("productNmId")));
+          await driver.sleep(_.random(SECOND, SECOND * 2));
+          const vendorCode = await vendorCodeElement.getText();
+          const close = await wait(until.elementLocated(By.className("popup__close")));
+
           await driver.sleep(_.random(SECOND * 2, SECOND * 3));
 
-          const vendorCode = await driver.findElement(By.id("productNmId")).getText();
-
-          const close = await driver.findElement(By.className("popup__close"));
           await close.click();
           await driver.sleep(_.random(SECOND, SECOND * 2));
 
