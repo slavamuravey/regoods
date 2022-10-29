@@ -77,3 +77,7 @@ export function createProxyFilePath(): string {
 export function createDeliveryCodesFilePath(): string {
   return path.resolve(createDataDirPath(), "codes.csv");
 }
+
+export function createDeliveryCodesErrorsFilePath(): string {
+  return path.resolve(createDataDirPath(), "codes_errors.csv");
+}

@@ -2,9 +2,8 @@ import { Command, Option } from "commander";
 import { run } from "../app/worker/code";
 import { container } from "../app/service-container";
 import { WbUserRepository } from "../app/repository/wb-user";
-import { Locker } from "../libs/locker";
 import fs from "fs";
-import { createDeliveryCodesFilePath } from "../utils/utils";
+import { createDeliveryCodesErrorsFilePath, createDeliveryCodesFilePath } from "../utils/utils";
 
 export const codeCmd = new Command();
 
@@ -25,12 +24,11 @@ codeCmd
   .addOption(new Option("--headless", "enable headless mode"))
   .addOption(new Option("--no-quit", "turn off quit on finish"))
   .addOption(new Option("--screencast", "enable screencast"))
-  .action(async ({ phone, workersCount, browser, proxy, headless, quit, screencast }) => {
+  .action(async ({ phone, workersCount, browser, proxy, headless, quit, screencast, workerRetries = 2 }) => {
     console.log("process pid: ", process.pid);
 
     const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
     const phones = phone ? [phone] : (await wbUserRepository.findAll()).map(wbUser => wbUser.phone);
-    const locker = new Locker();
 
     await fs.promises.writeFile(createDeliveryCodesFilePath(), [
       "phone",
@@ -40,20 +38,36 @@ codeCmd
       "vendorCode"
     ].join(",") + "\n");
 
-    for (const phone of phones) {
-      if (workersCount === 0) {
-        locker.lock();
+    await fs.promises.writeFile(createDeliveryCodesErrorsFilePath(), "");
+
+    const phonesRetries: Record<string, number> = {};
+    const runWorker = async () => {
+      const phone = phones.pop();
+      if (phone === undefined) {
+        return;
       }
 
-      await locker.getPromise();
-
       const { pid, result } = run({ phone, browser, proxy, headless, quit, screencast });
-      workersCount--;
+      const code = await result;
 
-      result.then(code => {
-        locker.unlock();
-        workersCount++;
-        console.log(`child ${pid} finished with code ${code}`);
-      });
+      if (code !== 0) {
+        if (phonesRetries[phone] === undefined) {
+          phonesRetries[phone] = workerRetries;
+        }
+
+        if (phonesRetries[phone] > 0) {
+          phonesRetries[phone]--;
+          phones.push(phone);
+        } else {
+          await fs.promises.appendFile(createDeliveryCodesErrorsFilePath(), `${phone}\n`);
+        }
+      }
+
+      console.log(`(${phone}) child ${pid} finished with code ${code}`);
+      process.nextTick(runWorker);
+    }
+
+    for (let i = 0; i < workersCount; i++) {
+      runWorker();
     }
   });

@@ -18,6 +18,8 @@ process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
 
   const codeGenerator: AsyncGenerator<StepMessage> = codeUsecase.code({ phone, browser, proxy, headless, quit });
 
+  let exitCode = 0;
+
   try {
     for await (const msg of codeGenerator) {
       console.log(msg);
@@ -30,9 +32,10 @@ process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
       return;
     }
 
+    exitCode = 1;
     console.error("internal error: ", e);
   } finally {
-    process.exit();
+    process.exit(exitCode);
   }
 });
 
@@ -77,9 +80,9 @@ export function run({ phone, browser, proxy, headless, quit, screencast }: CodeR
 
   return {
     pid: child.pid!,
-    result: new Promise((resolve, reject) => {
+    result: new Promise((resolve) => {
       child.on("exit", (code) => {
-        code === 0 ? resolve(code) : reject(code);
+        resolve(Number(code));
       });
     })
   };
