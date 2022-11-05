@@ -5,9 +5,9 @@ import { AddToCartParams, AddToCartUsecase, AddToCartUsecaseError } from "../add
 import { By, Key, ThenableWebDriver } from "selenium-webdriver";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { StepMessage } from "../step-message";
+import { BrowserActionNotification, DebuggerAddressNotification } from "../step-message";
 import type { ProxyResolver } from "../../service/proxy-resolver";
 import _ from "lodash";
-import { BrowserActionNotification, DebuggerAddressNotification, NeedStopProcess } from "../step-message";
 
 export class AddToCartUsecaseImpl implements AddToCartUsecase {
   constructor(readonly wbUserSessionRepository: WbUserSessionRepository, readonly proxyResolver: ProxyResolver) {
@@ -196,13 +196,6 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       await popupChooseButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield new BrowserActionNotification("Click popup choose button");
-
-      yield new NeedStopProcess(`Need stop process, to continue execute "kill -SIGCONT ${process.pid}"`);
-
-      const doOrderButton = driver.findElement(By.className("b-btn-do-order"));
-      await doOrderButton.click();
-      await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield new BrowserActionNotification("Click do order button");
     } finally {
       if (quit) {
         await driver.quit();
