@@ -1,5 +1,7 @@
 import { Command, Option } from "commander";
 import { run } from "../app/worker/login";
+import { createLoginErrorsFilePath } from "../utils/utils";
+import { runWorkers } from "../app/worker/worker";
 
 export const loginCmd = new Command();
 
@@ -8,6 +10,7 @@ loginCmd
   .description("login user, if phone is empty, new user will be created")
   .addOption(new Option("--phone <string>", "user's phone number, ex. 79231234567"))
   .addOption(new Option("--gender <string>", "user's gender").choices(["man", "woman"]))
+  .addOption(new Option("--workers-count <string>", "workers count, ignored when --phone is not empty").default(1))
   .addOption(
     new Option("--browser <string>", "browser name").choices(["chrome", "firefox"]).default("chrome")
   )
@@ -20,8 +23,17 @@ loginCmd
   )
   .addOption(new Option("--headless", "enable headless mode"))
   .addOption(new Option("--no-quit", "turn off quit on finish"))
-  .action(async ({ phone, gender, browser, proxy, userAgent, headless, quit }) => {
+  .addOption(new Option("--screencast", "enable screencast"))
+  .action(async ({ phone, gender, workersCount, browser, proxy, userAgent, headless, quit, screencast, workerRetries = 0 }) => {
     console.log("process pid: ", process.pid);
 
-    run({ phone, gender, browser, proxy, userAgent, headless, quit });
+    const paramsList = [{ phone, gender, browser, proxy, userAgent, headless, quit, screencast }];
+
+    await runWorkers(
+      paramsList,
+      run,
+      workersCount,
+      workerRetries,
+      createLoginErrorsFilePath()
+    );
   });

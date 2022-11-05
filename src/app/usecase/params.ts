@@ -2,5 +2,9 @@ export interface BrowserParams {
   browser: "chrome" | "firefox";
   headless?: boolean;
   quit: boolean;
-  proxy: string | boolean;
+  proxy?: string | boolean;
+}
+
+export interface ScreencastParams {
+  screencast?: boolean;
 }

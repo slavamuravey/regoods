@@ -11,7 +11,7 @@ import {
   DeliveryItemNotificationStepMessageType,
   NeedStopProcessStepMessageType
 } from "../usecase/step-message";
-import type { WorkerRunResponse } from "./worker";
+import type { WorkerRunResult } from "./worker";
 
 process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
   const codeUsecase: CodeUsecase = container.get("code-usecase");
@@ -39,10 +39,10 @@ process.on("message", async ({ phone, browser, proxy, headless, quit }) => {
   }
 });
 
-export interface CodeRunPayload extends CodeParams {
+export interface WorkerParams extends CodeParams {
 }
 
-export function run({ phone, browser, proxy, headless, quit, screencast }: CodeRunPayload): WorkerRunResponse {
+export function run({ phone, browser, proxy, headless, quit, screencast }: WorkerParams): WorkerRunResult {
   const child = fork(__filename, { silent: true });
 
   const createLogStdoutStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${phone}-${process.pid}-${child.pid}-code-stdout.log`), { flags: "a" });

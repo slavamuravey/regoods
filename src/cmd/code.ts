@@ -4,6 +4,7 @@ import { container } from "../app/service-container";
 import { WbUserRepository } from "../app/repository/wb-user";
 import fs from "fs";
 import { createDeliveryCodesErrorsFilePath, createDeliveryCodesFilePath } from "../utils/utils";
+import { runWorkers } from "../app/worker/worker";
 
 export const codeCmd = new Command();
 
@@ -29,6 +30,7 @@ codeCmd
 
     const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
     const phones = phone ? [phone] : (await wbUserRepository.findAll()).map(wbUser => wbUser.phone);
+    const paramsList = phones.map(phone => ({ phone, browser, proxy, headless, quit, screencast }));
 
     await fs.promises.writeFile(createDeliveryCodesFilePath(), [
       "phone",
@@ -38,36 +40,11 @@ codeCmd
       "vendorCode"
     ].join(",") + "\n");
 
-    await fs.promises.writeFile(createDeliveryCodesErrorsFilePath(), "");
-
-    const phonesRetries: Record<string, number> = {};
-    const runWorker = async () => {
-      const phone = phones.pop();
-      if (phone === undefined) {
-        return;
-      }
-
-      const { pid, result } = run({ phone, browser, proxy, headless, quit, screencast });
-      const code = await result;
-
-      if (code !== 0) {
-        if (phonesRetries[phone] === undefined) {
-          phonesRetries[phone] = workerRetries;
-        }
-
-        if (phonesRetries[phone] > 0) {
-          phonesRetries[phone]--;
-          phones.push(phone);
-        } else {
-          await fs.promises.appendFile(createDeliveryCodesErrorsFilePath(), `${phone}\n`);
-        }
-      }
-
-      console.log(`(${phone}) child ${pid} finished with code ${code}`);
-      process.nextTick(runWorker);
-    }
-
-    for (let i = 0; i < workersCount; i++) {
-      runWorker();
-    }
+    await runWorkers(
+      paramsList,
+      run,
+      workersCount,
+      workerRetries,
+      createDeliveryCodesErrorsFilePath()
+    );
   });

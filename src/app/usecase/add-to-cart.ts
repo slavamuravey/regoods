@@ -1,7 +1,7 @@
 import type { StepMessage } from "./step-message";
-import type { BrowserParams } from "./browser-params";
+import type { BrowserParams, ScreencastParams } from "./params";
 
-export interface AddToCartParams extends BrowserParams {
+export interface AddToCartParams extends BrowserParams, ScreencastParams {
   phone: string;
   vendorCode: string;
   keyPhrase: string;

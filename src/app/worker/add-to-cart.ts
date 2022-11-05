@@ -7,6 +7,7 @@ import type { StepMessage } from "../usecase/step-message";
 import { AddToCartUsecaseError } from "../usecase/add-to-cart";
 import { createLogDirPath } from "../../utils/utils";
 import { DebuggerAddressNotificationStepMessageType, NeedStopProcessStepMessageType } from "../usecase/step-message";
+import type { WorkerRunResult } from "./worker";
 
 process.on("message", async ({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit }) => {
   const addToCartUsecase: AddToCartUsecase = container.get("add-to-cart-usecase");
@@ -23,6 +24,8 @@ process.on("message", async ({ phone, vendorCode, keyPhrase, size, address, brow
     quit
   });
 
+  let exitCode = 0;
+
   try {
     for await (const msg of addToCartGenerator) {
       console.log(msg);
@@ -35,13 +38,14 @@ process.on("message", async ({ phone, vendorCode, keyPhrase, size, address, brow
       return;
     }
 
+    exitCode = 1;
     console.error("internal error: ", e);
   } finally {
-    process.exit();
+    process.exit(exitCode);
   }
 });
 
-export interface AddToCartRunPayload extends AddToCartParams {
+export interface WorkerParams extends AddToCartParams {
 }
 
 export function run({
@@ -53,8 +57,9 @@ export function run({
                       browser,
                       proxy,
                       headless,
-                      quit
-                    }: AddToCartRunPayload) {
+                      quit,
+                      screencast
+                    }: WorkerParams): WorkerRunResult {
   const child = fork(__filename, { silent: true });
 
   const createLogStdoutStream = () => fs.createWriteStream(path.resolve(createLogDirPath(), `${phone}-${process.pid}-${child.pid}-add-to-cart-stdout.log`), { flags: "a" });
@@ -70,10 +75,21 @@ export function run({
     }
 
     if (msg.type === DebuggerAddressNotificationStepMessageType) {
-      const screencast = fork(path.resolve(__dirname, "./screencast"), { silent: true });
-      screencast.stdout!.pipe(createLogStdoutStream());
-      screencast.stderr!.pipe(createLogStderrStream());
-      screencast.send({ phone, debuggerAddress: msg.data.debuggerAddress });
+      if (screencast) {
+        const screencast = fork(path.resolve(__dirname, "./screencast"), { silent: true });
+        screencast.stdout!.pipe(createLogStdoutStream());
+        screencast.stderr!.pipe(createLogStderrStream());
+        screencast.send({ phone, debuggerAddress: msg.data.debuggerAddress });
+      }
     }
   });
+
+  return {
+    pid: child.pid!,
+    result: new Promise((resolve) => {
+      child.on("exit", (code) => {
+        resolve(Number(code));
+      });
+    })
+  };
 }

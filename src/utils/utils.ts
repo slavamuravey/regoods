@@ -79,5 +79,17 @@ export function createDeliveryCodesFilePath(): string {
 }
 
 export function createDeliveryCodesErrorsFilePath(): string {
-  return path.resolve(createDataDirPath(), "codes_errors.csv");
+  return path.resolve(createDataDirPath(), "codes_errors.txt");
+}
+
+export function createAddToCartErrorsFilePath(): string {
+  return path.resolve(createDataDirPath(), "add_to_cart_errors.txt");
+}
+
+export function createLoginErrorsFilePath(): string {
+  return path.resolve(createDataDirPath(), "login_errors.txt");
+}
+
+export function createRedemptionFilePath(): string {
+  return path.resolve(createDataDirPath(), "redemption.csv");
 }
