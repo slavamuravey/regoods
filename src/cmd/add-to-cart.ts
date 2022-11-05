@@ -43,7 +43,7 @@ addToCartCmd
     console.log("process pid: ", process.pid);
 
     if (phone) {
-      for (const [paramName, paramValue] of Object.entries({vendorCode, keyPhrase, size, address})) {
+      for (const [paramName, paramValue] of Object.entries({vendorCode, keyPhrase})) {
         if (!paramValue) {
           console.error(`${paramName}: required option is not specified.`);
           process.exit(1);

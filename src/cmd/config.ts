@@ -21,12 +21,12 @@ export const addToCartFileFieldsConfig: FieldsConfig = {
     validators: [new NotEmptyValidator()]
   },
   size: {
-    transformers: [],
-    validators: [new NotEmptyValidator()]
+    transformers: [new EmptyTransformer()],
+    validators: []
   },
   address: {
-    transformers: [],
-    validators: [new NotEmptyValidator()]
+    transformers: [new EmptyTransformer()],
+    validators: []
   },
   browser: {
     transformers: [new DefaultTransformer("chrome")],

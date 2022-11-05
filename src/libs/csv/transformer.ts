@@ -2,7 +2,7 @@ import type { FieldTransformer } from "./parser";
 
 export class EmptyTransformer implements FieldTransformer {
   transform(value: string): string | boolean | undefined {
-    if (value === "0") {
+    if (value === "-") {
       return false;
     }
 
