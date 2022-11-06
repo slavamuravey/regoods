@@ -33,8 +33,10 @@ export async function runWorkers<T extends object>(
         retriesMap.set(params, retries);
       }
 
-      if (retriesMap.get(params)! > 0) {
-        retriesMap.set(params, --retries);
+      const paramsRetries = retriesMap.get(params)!;
+
+      if (paramsRetries > 0) {
+        retriesMap.set(params, paramsRetries - 1);
         paramsList.push(params);
       } else {
         await fs.promises.appendFile(errorFilePath, `${serializedParams}\n`);
