@@ -55,18 +55,26 @@ export class CodeUsecaseImpl implements CodeUsecase {
       const deliveryIcon = await wait(until.elementLocated(By.className("navbar-pc__icon--delivery")));
       await wait(until.elementIsVisible(deliveryIcon));
 
-      let deliveryCountNotification = null;
+      let itemsDeliveryNotificationIconCount = 0;
 
       try {
-        deliveryCountNotification = await deliveryIcon.findElement(By.className("navbar-pc__notify"));
+        const deliveryCountNotification = await driver.findElement(By.css(".navbar-pc__icon--delivery .navbar-pc__notify"));
+        itemsDeliveryNotificationIconCount = parseInt(await deliveryCountNotification.getText());
       } catch {
       }
 
-      yield new BrowserActionNotification("Open delivery page");
+      yield new BrowserActionNotification("Open delivery page", {
+        itemsDeliveryNotificationIconCount
+      });
 
       let deliveryAddresses: WebElement[] = [];
-      if (deliveryCountNotification) {
+      if (itemsDeliveryNotificationIconCount > 0) {
         deliveryAddresses = await wait(until.elementsLocated(By.className("delivery-block__content")));
+      }
+
+      const itemsActualCount = (await driver.findElements(By.className("goods-list-delivery__price-value"))).length;
+      if (itemsActualCount !== itemsDeliveryNotificationIconCount) {
+        throw new Error(`items count mismatched, icon: ${itemsDeliveryNotificationIconCount}, actual: ${itemsActualCount}`);
       }
 
       await driver.sleep(SECOND * 2);

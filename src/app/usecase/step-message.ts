@@ -9,9 +9,7 @@ export const NeedStopProcessStepMessageType = "need-stop-process";
 export class NeedStopProcess implements StepMessage {
   type = NeedStopProcessStepMessageType;
 
-  constructor(readonly description: string) {
-    this.description = description;
-  }
+  constructor(public readonly description: string) {}
 }
 
 export const DebuggerAddressNotificationStepMessageType = "debugger-address-notification";
@@ -23,10 +21,7 @@ export interface DebuggerAddress {
 export class DebuggerAddressNotification implements StepMessage {
   type = DebuggerAddressNotificationStepMessageType;
 
-  constructor(readonly description: string, readonly data: DebuggerAddress) {
-    this.description = description;
-    this.data = data;
-  }
+  constructor(public readonly description: string, public readonly data: DebuggerAddress) {}
 }
 
 export const BrowserActionNotificationStepMessageType = "browser-action-notification";
@@ -34,9 +29,7 @@ export const BrowserActionNotificationStepMessageType = "browser-action-notifica
 export class BrowserActionNotification implements StepMessage {
   type = BrowserActionNotificationStepMessageType;
 
-  constructor(readonly description: string) {
-    this.description = description;
-  }
+  constructor(public readonly description: string, readonly data?: any) {}
 }
 
 export const DeliveryItemNotificationStepMessageType = "delivery-item-notification";
@@ -52,8 +45,5 @@ export interface DeliveryItem {
 export class DeliveryItemNotification implements StepMessage {
   type = DeliveryItemNotificationStepMessageType;
 
-  constructor(readonly description: string, readonly data: DeliveryItem) {
-    this.description = description;
-    this.data = data;
-  }
+  constructor(public readonly description: string, public readonly data: DeliveryItem) {}
 }
