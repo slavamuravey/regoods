@@ -57,7 +57,7 @@ addToCartCmd
     ;
 
     await runWorkers(
-      paramsList,
+      paramsList[Symbol.iterator](),
       run,
       workersCount,
       workerRetries,

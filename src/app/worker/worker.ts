@@ -6,7 +6,7 @@ export interface WorkerRunResult {
 }
 
 export async function runWorkers<T extends object>(
-  paramsList: T[],
+  paramsIterator: Iterator<T>,
   workerRunFn: (params: T) => WorkerRunResult,
   count: number,
   retries: number,
@@ -15,9 +15,22 @@ export async function runWorkers<T extends object>(
   await fs.promises.writeFile(errorFilePath, "");
 
   const retriesMap = new WeakMap<T, number>();
+  const paramsRetriesList: T[] = [];
+
+  const takeParams = () => {
+    let params = paramsRetriesList.pop();
+
+    if (params !== undefined) {
+      return params;
+    }
+
+    const { value } = paramsIterator.next();
+
+    return value;
+  };
 
   const runWorker = async () => {
-    const params = paramsList.pop();
+    const params = takeParams();
     if (params === undefined) {
       return;
     }
@@ -37,7 +50,7 @@ export async function runWorkers<T extends object>(
 
       if (paramsRetries > 0) {
         retriesMap.set(params, paramsRetries - 1);
-        paramsList.push(params);
+        paramsRetriesList.push(params);
       } else {
         await fs.promises.appendFile(errorFilePath, `${serializedParams}\n`);
       }

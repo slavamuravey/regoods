@@ -7,7 +7,6 @@
     "build": "tsc -b src",
     "cli": "npm run build && node build/cli.js",
     "cli:dev": "node -r ts-node/register src/cli.ts",
-    "screencast:dev": "node -r ts-node/register src/screencast.ts",
     "postinstall": "sed -i 's/cdc_/xxx_/g' ./node_modules/chromedriver/lib/chromedriver/chromedriver"
   },
   "keywords": [],

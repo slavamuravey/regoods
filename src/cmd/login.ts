@@ -30,7 +30,7 @@ loginCmd
     const paramsList = [{ phone, gender, browser, proxy, userAgent, headless, quit, screencast }];
 
     await runWorkers(
-      paramsList,
+      paramsList[Symbol.iterator](),
       run,
       workersCount,
       workerRetries,
