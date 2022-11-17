@@ -10,6 +10,7 @@ import { profileCmd } from "./cmd/profile";
 import { loginCmd } from "./cmd/login";
 import { addToCartCmd } from "./cmd/add-to-cart";
 import { codeCmd } from "./cmd/code";
+import { keyPhraseCmd } from "./cmd/key-phrase";
 
 const program = new Command();
 
@@ -22,5 +23,6 @@ program.addCommand(profileCmd);
 program.addCommand(loginCmd);
 program.addCommand(addToCartCmd);
 program.addCommand(codeCmd);
+program.addCommand(keyPhraseCmd);
 
 program.parse();

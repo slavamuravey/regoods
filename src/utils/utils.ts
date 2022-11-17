@@ -82,6 +82,10 @@ export function createDeliveryCodesErrorsFilePath(): string {
   return path.resolve(createDataDirPath(), "codes_errors.txt");
 }
 
+export function createKeyPhraseErrorsFilePath(): string {
+  return path.resolve(createDataDirPath(), "key_phrase_errors.txt");
+}
+
 export function createAddToCartErrorsFilePath(): string {
   return path.resolve(createDataDirPath(), "add_to_cart_errors.txt");
 }

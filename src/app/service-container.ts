@@ -11,6 +11,7 @@ import { LoginUsecaseFactory } from "./usecase/factory/login";
 import { ProfileUsecaseFactory } from "./usecase/factory/profile";
 import { CodeUsecaseFactory } from "./usecase/factory/code";
 import { AddToCartUsecaseFactory } from "./usecase/factory/add-to-cart";
+import { KeyPhraseUsecaseFactory } from "./usecase/factory/key-phrase";
 import { Container } from "../libs/service-container";
 import type { ServiceSpec } from "../libs/service-container/types";
 
@@ -54,6 +55,9 @@ spec.set("code-usecase", {
 });
 spec.set("add-to-cart-usecase", {
   factory: new AddToCartUsecaseFactory()
+});
+spec.set("key-phrase-usecase", {
+  factory: new KeyPhraseUsecaseFactory()
 });
 
 export const container = new Container(spec);
