@@ -90,6 +90,16 @@ export class CodeUsecaseImpl implements CodeUsecase {
 
         const deliveryItems = await deliveryAddress.findElements(By.className("goods-list-delivery__item"));
 
+        const profileIcon = await wait(until.elementLocated(By.className("navbar-pc__icon--profile")));
+        await wait(until.elementIsVisible(profileIcon));
+        const actions = driver.actions({ async: true });
+        await actions.move({ origin: profileIcon }).perform();
+
+        const profileNameElement = await wait(until.elementLocated(By.className("profile-menu__name")));
+        const profileName = await profileNameElement.getText();
+
+        await actions.move({ x: 0, y: 0 }).perform();
+
         for (const deliveryItem of deliveryItems) {
           const status = await deliveryItem.findElement(By.className("goods-list-delivery__price-status")).getText();
           const address = await deliveryAddress.findElement(By.className("delivery-address__info")).getText();
@@ -111,6 +121,7 @@ export class CodeUsecaseImpl implements CodeUsecase {
 
           yield new DeliveryItemNotification("Found delivery item", {
             phone,
+            profileName,
             address,
             code,
             status,

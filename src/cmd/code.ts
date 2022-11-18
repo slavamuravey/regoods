@@ -34,6 +34,7 @@ codeCmd
 
     await fs.promises.writeFile(createDeliveryCodesFilePath(), [
       "phone",
+      "profileName",
       "address",
       "code",
       "status",

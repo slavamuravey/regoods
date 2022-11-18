@@ -36,6 +36,7 @@ export const DeliveryItemNotificationStepMessageType = "delivery-item-notificati
 
 export interface DeliveryItem {
   phone: string;
+  profileName: string;
   address: string;
   code: string;
   status: string;
