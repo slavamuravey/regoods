@@ -67,10 +67,12 @@ export function run({ phone, browser, proxy, headless, quit, screencast }: Worke
     }
 
     if (msg.type === DeliveryItemNotificationStepMessageType) {
-      const { data: { phone, profileName, address, code, status, vendorCode } } = msg;
+      const { data: { phone, profileName, size, sizeRu, address, code, status, vendorCode } } = msg;
       await fs.promises.appendFile(createDeliveryCodesFilePath(), [
         `"${phone}"`,
         `"${profileName}"`,
+        `"${size}"`,
+        `"${sizeRu}"`,
         `"${address}"`,
         `"${code}"`,
         `"${status}"`,

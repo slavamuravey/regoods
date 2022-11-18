@@ -110,8 +110,21 @@ export class CodeUsecaseImpl implements CodeUsecase {
           await photo.click();
 
           const vendorCodeElement = await wait(until.elementLocated(By.id("productNmId")));
+
+          let sizeElement = null;
+          try {
+            sizeElement = await driver.findElement(By.css(".j-size.active .sizes-list__size"));
+          } catch {}
+
+          let sizeRuElement = null;
+          try {
+            sizeRuElement = await driver.findElement(By.css(".j-size.active .sizes-list__size-ru"));
+          } catch {}
+
           await driver.sleep(SECOND * 2);
           const vendorCode = await vendorCodeElement.getText();
+          const size = sizeElement ? await sizeElement.getText() : "";
+          const sizeRu = sizeRuElement ? await sizeRuElement.getText() : "";
           const close = await wait(until.elementLocated(By.className("popup__close")));
 
           await driver.sleep(SECOND * 3);
@@ -122,6 +135,8 @@ export class CodeUsecaseImpl implements CodeUsecase {
           yield new DeliveryItemNotification("Found delivery item", {
             phone,
             profileName,
+            size,
+            sizeRu,
             address,
             code,
             status,
