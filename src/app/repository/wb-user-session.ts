@@ -17,7 +17,7 @@ export interface WbUserSessionRepository {
 
   create(payload: WbUserSessionCreatePayload): Promise<WbUserSession>;
 
-  update(phone: string, payload: WbUserSessionUpdatePayload): Promise<void>;
+  update(id: string, phone: string, payload: WbUserSessionUpdatePayload): Promise<void>;
 }
 
 export class WbUserSessionNotFoundError extends Error {

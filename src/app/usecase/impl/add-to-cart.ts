@@ -94,7 +94,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
         const cookies = await getCookies(driver);
 
-        await wbUserSessionRepository.update(sessionId, { cookies });
+        await wbUserSessionRepository.update(sessionId, phone, { cookies });
       }
 
       const searchInput = driver.findElement(By.id("searchInput"));

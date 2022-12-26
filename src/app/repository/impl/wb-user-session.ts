@@ -2,7 +2,7 @@ import fs from "fs";
 import {
   createCookiesFilePath,
   createUserAgentFilePath,
-  createUsersDirPath, createUserSessionDirPath,
+  createUserSessionDirPath,
   createUserSessionsDirPath,
   storeCookies,
   storeUserAgent
@@ -55,28 +55,24 @@ export class WbUserSessionRepositoryImpl implements WbUserSessionRepository {
     };
   }
 
-  async update(id: string, payload: WbUserSessionUpdatePayload): Promise<void> {
+  async update(id: string, phone: string, payload: WbUserSessionUpdatePayload): Promise<void> {
     const { cookies, userAgent } = payload;
 
-    const phones = await fs.promises.readdir(createUsersDirPath());
-
-    for (const phone of phones) {
-      const sessions = await fs.promises.readdir(createUserSessionsDirPath(phone));
-      for (const session of sessions) {
-        if (id === session) {
-          if (cookies) {
-            await storeCookies(phone, id, JSON.stringify(cookies));
-          }
-
-          if (userAgent) {
-            await storeUserAgent(phone, id, userAgent);
-          }
-
-          return;
+    const sessions = await fs.promises.readdir(createUserSessionsDirPath(phone));
+    for (const session of sessions) {
+      if (id === session) {
+        if (cookies) {
+          await storeCookies(phone, id, JSON.stringify(cookies));
         }
+
+        if (userAgent) {
+          await storeUserAgent(phone, id, userAgent);
+        }
+
+        return;
       }
     }
 
-    throw new WbUserSessionNotFoundError(`session "${id}" is not found.`);
+    throw new WbUserSessionNotFoundError(`session "${id}" is not found for phone "${phone}".`);
   }
 }
