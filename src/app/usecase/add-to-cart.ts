@@ -12,10 +12,3 @@ export interface AddToCartParams extends BrowserParams, ScreencastParams {
 export interface AddToCartUsecase {
   addToCart(params: AddToCartParams): AsyncGenerator<StepMessage>;
 }
-
-export class AddToCartUsecaseError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}

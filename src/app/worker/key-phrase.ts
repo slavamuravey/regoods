@@ -3,18 +3,19 @@ import fs from "fs";
 import { fork } from "child_process";
 import { container } from "../service-container";
 import type { KeyPhraseParams, KeyPhraseUsecase } from "../usecase/key-phrase";
-import { KeyPhraseUsecaseError } from "../usecase/key-phrase";
 import type { StepMessage } from "../usecase/step-message";
 import { DebuggerAddressNotificationStepMessageType, NeedStopProcessStepMessageType } from "../usecase/step-message";
 import { createLogDirPath } from "../../utils/utils";
+import { ExitCodeInternalError, ExitCodeSuccess, ExitCodeUsecaseError } from "./exit-code";
 import type { WorkerRunResult } from "./worker";
+import { UsecaseError } from "../usecase/error";
 
 process.on("message", async ({ phone, keyPhrase, browser, proxy, headless, quit }) => {
   const keyPhraseUsecase: KeyPhraseUsecase = container.get("key-phrase-usecase");
 
   const keyPhraseGenerator: AsyncGenerator<StepMessage> = keyPhraseUsecase.keyPhrase({ phone, keyPhrase, browser, proxy, headless, quit });
 
-  let exitCode = 0;
+  let exitCode = ExitCodeSuccess;
 
   try {
     for await (const msg of keyPhraseGenerator) {
@@ -22,13 +23,14 @@ process.on("message", async ({ phone, keyPhrase, browser, proxy, headless, quit 
       process.send!(msg);
     }
   } catch (e) {
-    if (e instanceof KeyPhraseUsecaseError) {
+    if (e instanceof UsecaseError) {
+      exitCode = ExitCodeUsecaseError;
       console.error(e);
 
       return;
     }
 
-    exitCode = 1;
+    exitCode = ExitCodeInternalError;
     console.error("internal error: ", e);
   } finally {
     process.exit(exitCode);

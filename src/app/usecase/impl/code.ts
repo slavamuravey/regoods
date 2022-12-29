@@ -7,6 +7,8 @@ import { BrowserActionNotification, DebuggerAddressNotification, DeliveryItemNot
 import type { ProxyResolver } from "../../service/proxy-resolver";
 import { By, until, WebElement } from "selenium-webdriver";
 import { createWait } from "../utils";
+import { UsecaseError } from "../error";
+import _ from "lodash";
 
 export class CodeUsecaseImpl implements CodeUsecase {
   constructor(
@@ -48,6 +50,15 @@ export class CodeUsecaseImpl implements CodeUsecase {
           continue;
         }
         await driver.manage().addCookie(cookie);
+      }
+
+      await driver.get("https://www.wildberries.ru");
+      await driver.sleep(_.random(SECOND, SECOND * 2));
+
+      try {
+        await driver.findElement(By.className("j-item-profile"));
+      } catch {
+        throw new UsecaseError(`unable to login`);
       }
 
       await driver.get("https://www.wildberries.ru/lk/myorders/delivery");

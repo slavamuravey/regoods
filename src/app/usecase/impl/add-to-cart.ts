@@ -1,13 +1,14 @@
 import { getCookies } from "../utils";
 import { SECOND } from "../../../libs/time";
 import { createDriver } from "../../../libs/selenium-webdriver";
-import { AddToCartParams, AddToCartUsecase, AddToCartUsecaseError } from "../add-to-cart";
+import { AddToCartParams, AddToCartUsecase } from "../add-to-cart";
 import { By, Key, ThenableWebDriver } from "selenium-webdriver";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { StepMessage } from "../step-message";
 import { BrowserActionNotification, DebuggerAddressNotification } from "../step-message";
 import type { ProxyResolver } from "../../service/proxy-resolver";
 import _ from "lodash";
+import { UsecaseError } from "../error";
 
 export class AddToCartUsecaseImpl implements AddToCartUsecase {
   constructor(readonly wbUserSessionRepository: WbUserSessionRepository, readonly proxyResolver: ProxyResolver) {
@@ -61,6 +62,13 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
       await driver.get("https://www.wildberries.ru");
       await driver.sleep(_.random(SECOND, SECOND * 2));
+
+      try {
+        await driver.findElement(By.className("j-item-profile"));
+      } catch {
+        throw new UsecaseError(`unable to login`);
+      }
+
       yield new BrowserActionNotification("Open main page as logged in user");
 
       const basketButton = driver.findElement(By.className("j-item-basket"));
@@ -89,7 +97,10 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield new BrowserActionNotification("Open main page after clean basket");
 
-      if (typeof address === "string") {
+      const addressElement = driver.findElement(By.className("simple-menu__link--address"));
+      const addressElementText = await addressElement.getText()
+
+      if (typeof address === "string" && address !== addressElementText) {
         yield* this.chooseAddress(driver, address);
 
         const cookies = await getCookies(driver);
@@ -132,7 +143,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
         }
 
         if (nextPageLink === null) {
-          throw new AddToCartUsecaseError(`product with vendor code "${vendorCode}" is not found.`);
+          throw new UsecaseError(`product with vendor code "${vendorCode}" is not found.`);
         }
 
         const footer = await driver.findElement(By.css("footer"));
@@ -162,6 +173,11 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield new BrowserActionNotification("Open characteristics");
 
+      const footer = driver.findElement(By.className("footer__container"));
+      await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth' });", footer);
+      await driver.sleep(_.random(SECOND * 3, SECOND * 6));
+      yield new BrowserActionNotification("Scroll to footer");
+
       const addToCartButton = driver.findElement(By.css("a.btn-main"));
       await addToCartButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
@@ -171,31 +187,6 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
       await cartButton.click();
       await driver.sleep(_.random(SECOND, SECOND * 2));
       yield new BrowserActionNotification("Click cart button");
-
-      let choosePayButton = null;
-
-      try {
-        choosePayButton = await driver.findElement(By.className("basket-pay__choose-pay"));
-      } catch {
-      }
-
-      if (choosePayButton === null) {
-        choosePayButton = await driver.findElement(By.css(".basket-pay .btn-edit"));
-      }
-
-      await choosePayButton.click();
-      await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield new BrowserActionNotification("Click choose pay method button");
-
-      const qrMethodButton = driver.findElement(By.className("icon-qrc"));
-      await qrMethodButton.click();
-      await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield new BrowserActionNotification("Click QR pay method button");
-
-      const popupChooseButton = driver.findElement(By.className("popup__btn-main"));
-      await popupChooseButton.click();
-      await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield new BrowserActionNotification("Click popup choose button");
     } finally {
       if (quit) {
         await driver.quit();
@@ -212,7 +203,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
     }
 
     if (sizeButton === null) {
-      throw new AddToCartUsecaseError(`size "${size}" is not found.`);
+      throw new UsecaseError(`size "${size}" is not found.`);
     }
 
     await sizeButton.click();
@@ -256,7 +247,7 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
     }
 
     if (addressItem === null) {
-      throw new AddToCartUsecaseError(`address "${address}" is not found.`);
+      throw new UsecaseError(`address "${address}" is not found.`);
     }
 
     await addressItem.click();

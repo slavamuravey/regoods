@@ -12,10 +12,3 @@ export interface LoginParams extends BrowserParams, ScreencastParams {
 export interface LoginUsecase {
   login(params: LoginParams): AsyncGenerator<StepMessage>;
 }
-
-export class LoginUsecaseError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}

@@ -1,4 +1,5 @@
 import fs from "fs";
+import { ExitCodeInternalError } from "./exit-code";
 
 export interface WorkerRunResult {
   pid: number;
@@ -41,7 +42,7 @@ export async function runWorkers<T extends object>(
     const code = await result;
     console.log(`(${serializedParams}) child ${pid} finished with code ${code}`);
 
-    if (code !== 0) {
+    if (code === ExitCodeInternalError) {
       if (!retriesMap.has(params)) {
         retriesMap.set(params, retries);
       }

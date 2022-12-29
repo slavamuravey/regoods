@@ -4,9 +4,10 @@ import { fork } from "child_process";
 import { container } from "../service-container";
 import type { AddToCartUsecase, AddToCartParams } from "../usecase/add-to-cart";
 import type { StepMessage } from "../usecase/step-message";
-import { AddToCartUsecaseError } from "../usecase/add-to-cart";
 import { createLogDirPath } from "../../utils/utils";
 import { DebuggerAddressNotificationStepMessageType, NeedStopProcessStepMessageType } from "../usecase/step-message";
+import { ExitCodeInternalError, ExitCodeSuccess, ExitCodeUsecaseError } from "./exit-code";
+import { UsecaseError } from "../usecase/error";
 import type { WorkerRunResult } from "./worker";
 
 process.on("message", async ({ phone, vendorCode, keyPhrase, size, address, browser, proxy, headless, quit }) => {
@@ -24,7 +25,7 @@ process.on("message", async ({ phone, vendorCode, keyPhrase, size, address, brow
     quit
   });
 
-  let exitCode = 0;
+  let exitCode = ExitCodeSuccess;
 
   try {
     for await (const msg of addToCartGenerator) {
@@ -32,13 +33,14 @@ process.on("message", async ({ phone, vendorCode, keyPhrase, size, address, brow
       process.send!(msg);
     }
   } catch (e) {
-    if (e instanceof AddToCartUsecaseError) {
+    if (e instanceof UsecaseError) {
+      exitCode = ExitCodeUsecaseError;
       console.error(e);
 
       return;
     }
 
-    exitCode = 1;
+    exitCode = ExitCodeInternalError;
     console.error("internal error: ", e);
   } finally {
     process.exit(exitCode);

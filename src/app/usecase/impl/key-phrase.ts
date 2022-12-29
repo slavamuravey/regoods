@@ -7,6 +7,7 @@ import type { ProxyResolver } from "../../service/proxy-resolver";
 import _ from "lodash";
 import { BrowserActionNotification, DebuggerAddressNotification } from "../step-message";
 import { By, Key } from "selenium-webdriver";
+import { UsecaseError } from "../error";
 
 export class KeyPhraseUsecaseImpl implements KeyPhraseUsecase {
   constructor(readonly wbUserSessionRepository: WbUserSessionRepository, readonly proxyResolver: ProxyResolver) {
@@ -44,6 +45,15 @@ export class KeyPhraseUsecaseImpl implements KeyPhraseUsecase {
           continue;
         }
         await driver.manage().addCookie(cookie);
+      }
+
+      await driver.get("https://www.wildberries.ru");
+      await driver.sleep(_.random(SECOND, SECOND * 2));
+
+      try {
+        await driver.findElement(By.className("j-item-profile"));
+      } catch {
+        throw new UsecaseError(`unable to login`);
       }
 
       await driver.get("https://www.wildberries.ru/lk");

@@ -4,10 +4,11 @@ import { fork } from "child_process";
 import { container } from "../service-container";
 import type { LoginParams, LoginUsecase } from "../usecase/login";
 import type { StepMessage } from "../usecase/step-message";
-import { LoginUsecaseError } from "../usecase/login";
 import { createLogDirPath } from "../../utils/utils";
 import { DebuggerAddressNotificationStepMessageType, NeedStopProcessStepMessageType } from "../usecase/step-message";
+import { ExitCodeInternalError, ExitCodeSuccess, ExitCodeUsecaseError } from "./exit-code";
 import type { WorkerRunResult } from "./worker";
+import { UsecaseError } from "../usecase/error";
 
 process.on("message", async ({ phone, gender, browser, proxy, userAgent, headless, quit }) => {
   const loginUsecase: LoginUsecase = container.get("login-usecase");
@@ -30,7 +31,7 @@ process.on("message", async ({ phone, gender, browser, proxy, userAgent, headles
 
   const loginGenerator: AsyncGenerator<StepMessage> = loginUsecase.login(params);
 
-  let exitCode = 0;
+  let exitCode = ExitCodeSuccess;
 
   try {
     for await (const msg of loginGenerator) {
@@ -38,13 +39,14 @@ process.on("message", async ({ phone, gender, browser, proxy, userAgent, headles
       process.send!(msg);
     }
   } catch (e) {
-    if (e instanceof LoginUsecaseError) {
+    if (e instanceof UsecaseError) {
+      exitCode = ExitCodeUsecaseError;
       console.error(e);
 
       return;
     }
 
-    exitCode = 1;
+    exitCode = ExitCodeInternalError;
     console.error("internal error: ", e);
   } finally {
     process.exit(exitCode);

@@ -1,6 +1,5 @@
 import { By, Key } from "selenium-webdriver";
 import { SECOND } from "../../../libs/time";
-import { LoginUsecaseError } from "../login";
 import { getCookies } from "../utils";
 import { createDriver } from "../../../libs/selenium-webdriver";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
@@ -13,6 +12,7 @@ import type { ProxyResolver } from "../../service/proxy-resolver";
 import _ from "lodash";
 import UserAgent from "user-agents";
 import { BrowserActionNotification, DebuggerAddressNotification } from "../step-message";
+import { UsecaseError } from "../error";
 
 export class LoginUsecaseImpl implements LoginUsecase {
   constructor(
@@ -108,7 +108,7 @@ export class LoginUsecaseImpl implements LoginUsecase {
       }
 
       if (!isAccountEmpty) {
-        throw new LoginUsecaseError(`account "${phoneResolved}" is not empty.`);
+        throw new UsecaseError(`account "${phoneResolved}" is not empty.`);
       }
 
       if (gender) {

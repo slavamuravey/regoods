@@ -1,8 +1,8 @@
 import { Command, Option } from "commander";
 import { container } from "../app/service-container";
 import type { ProfileUsecase } from "../app/usecase/profile";
-import { ProfileUsecaseError } from "../app/usecase/profile";
 import type { StepMessage } from "../app/usecase/step-message";
+import { UsecaseError } from "../app/usecase/error";
 
 export const profileCmd = new Command();
 
@@ -37,7 +37,7 @@ profileCmd
         console.log(msg);
       }
     } catch (e) {
-      if (e instanceof ProfileUsecaseError) {
+      if (e instanceof UsecaseError) {
         console.error(e);
 
         return;

@@ -9,10 +9,3 @@ export interface KeyPhraseParams extends BrowserParams, ScreencastParams {
 export interface KeyPhraseUsecase {
   keyPhrase(params: KeyPhraseParams): AsyncGenerator<StepMessage>;
 }
-
-export class KeyPhraseUsecaseError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}
