@@ -71,32 +71,6 @@ export class AddToCartUsecaseImpl implements AddToCartUsecase {
 
       yield new BrowserActionNotification("Open main page as logged in user");
 
-      const basketButton = driver.findElement(By.className("j-item-basket"));
-      await basketButton.click();
-      await driver.sleep(_.random(SECOND * 2, SECOND * 4));
-      yield new BrowserActionNotification("Click basket button");
-
-      while (true) {
-        let removeItemButton = null;
-
-        try {
-          removeItemButton = await driver.findElement(By.className("btn__del"));
-        } catch {
-        }
-
-        if (removeItemButton === null) {
-          break;
-        }
-
-        await removeItemButton.click();
-        await driver.sleep(_.random(SECOND, SECOND * 2));
-        yield new BrowserActionNotification("Remove item from the cart");
-      }
-
-      await driver.get("https://www.wildberries.ru");
-      await driver.sleep(_.random(SECOND, SECOND * 2));
-      yield new BrowserActionNotification("Open main page after clean basket");
-
       const addressElement = driver.findElement(By.className("simple-menu__link--address"));
       const addressElementText = await addressElement.getText()
 
