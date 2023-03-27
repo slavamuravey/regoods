@@ -1,7 +1,7 @@
 import { Command, Option } from "commander";
-import { run } from "../app/worker/login";
-import { createLoginErrorsFilePath } from "../utils/utils";
-import { runWorkers } from "../app/worker/worker";
+import type { WorkersLauncher } from "../app/worker/workers-launcher";
+import { container } from "../app/service-container";
+import { Scenario } from "../app/usecase/scenario";
 
 export const loginCmd = new Command();
 
@@ -29,11 +29,16 @@ loginCmd
 
     const paramsList = [{ phone, gender, browser, proxy, userAgent, headless, quit, screencast }];
 
-    await runWorkers(
-      paramsList[Symbol.iterator](),
-      run,
+    const workersLauncher: WorkersLauncher = container.get("workers-launcher");
+    await workersLauncher.launch({
+      scenario: Scenario.Login,
+      paramsIterator: paramsList[Symbol.iterator](),
       workersCount,
-      workerRetries,
-      createLoginErrorsFilePath()
-    );
+      retriesCount: workerRetries,
+      getParamsKey: (jobIndex: number, params: any) => params.phone,
+      messageListeners: [
+        container.get("debugger-address-message-listener"),
+        container.get("need-stop-message-listener")
+      ]
+    });
   });

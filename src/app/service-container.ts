@@ -12,6 +12,13 @@ import { ProfileUsecaseFactory } from "./usecase/factory/profile";
 import { CodeUsecaseFactory } from "./usecase/factory/code";
 import { AddToCartUsecaseFactory } from "./usecase/factory/add-to-cart";
 import { KeyPhraseUsecaseFactory } from "./usecase/factory/key-phrase";
+import { ScreencastLauncherFactory } from "./worker/factory/screencast-launcher";
+import { JobLauncherFactory } from "./worker/factory/job-launcher";
+import { DebuggerAddressMessageListenerFactory } from "./worker/message-listener/factory/debugger-address";
+import { NeedStopMessageListenerFactory } from "./worker/message-listener/factory/need-stop";
+import { ScreencastFrameListenerFactory } from "./worker/factory/screencast-frame-listener";
+import { WorkersLauncherFactory } from "./worker/factory/workers-launcher";
+import { DeliveryItemMessageListenerFactory } from "./worker/message-listener/factory/delivery-item";
 import { Container } from "../libs/service-container";
 import type { ServiceSpec } from "../libs/service-container/types";
 
@@ -58,6 +65,27 @@ spec.set("add-to-cart-usecase", {
 });
 spec.set("key-phrase-usecase", {
   factory: new KeyPhraseUsecaseFactory()
+});
+spec.set("screencast-launcher", {
+  factory: new ScreencastLauncherFactory()
+});
+spec.set("job-launcher", {
+  factory: new JobLauncherFactory()
+});
+spec.set("debugger-address-message-listener", {
+  factory: new DebuggerAddressMessageListenerFactory()
+});
+spec.set("delivery-item-message-listener", {
+  factory: new DeliveryItemMessageListenerFactory()
+});
+spec.set("need-stop-message-listener", {
+  factory: new NeedStopMessageListenerFactory()
+});
+spec.set("screencast-frame-listener", {
+  factory: new ScreencastFrameListenerFactory()
+});
+spec.set("workers-launcher", {
+  factory: new WorkersLauncherFactory()
 });
 
 export const container = new Container(spec);

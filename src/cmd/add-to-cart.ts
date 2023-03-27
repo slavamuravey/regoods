@@ -1,10 +1,11 @@
 import { Command, Option } from "commander";
-import { createAddToCartErrorsFilePath, createRedemptionFilePath } from "../utils/utils";
+import { createRedemptionFilePath } from "../utils/utils";
 import { parseCsvFile } from "../libs/csv";
 import { addToCartFileFieldsConfig } from "./config";
 import type { AddToCartParams } from "../app/usecase/add-to-cart";
-import { runWorkers } from "../app/worker/worker";
-import { run } from "../app/worker/add-to-cart";
+import type { WorkersLauncher } from "../app/worker/workers-launcher";
+import { container } from "../app/service-container";
+import { Scenario } from "../app/usecase/scenario";
 
 export const addToCartCmd = new Command();
 
@@ -56,11 +57,16 @@ addToCartCmd
       await parseCsvFile<any, AddToCartParams>(createRedemptionFilePath(), addToCartFileFieldsConfig)
     ;
 
-    await runWorkers(
-      paramsList[Symbol.iterator](),
-      run,
+    const workersLauncher: WorkersLauncher = container.get("workers-launcher");
+    await workersLauncher.launch({
+      scenario: Scenario.AddToCart,
+      paramsIterator: paramsList[Symbol.iterator](),
       workersCount,
-      workerRetries,
-      createAddToCartErrorsFilePath()
-    );
+      retriesCount: workerRetries,
+      getParamsKey: (jobIndex: number, params: any) => params.phone,
+      messageListeners: [
+        container.get("debugger-address-message-listener"),
+        container.get("need-stop-message-listener")
+      ]
+    });
   });

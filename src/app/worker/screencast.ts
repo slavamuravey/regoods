@@ -1,17 +1,26 @@
 import CDP from "chrome-remote-interface";
 import Protocol from "devtools-protocol";
-import { v4 as uuid } from "uuid";
-import { storeScreencastFrame } from "../../utils/utils";
+import { container } from "../service-container";
+import type { ScreencastFrameListener } from "./screencast-frame-listener";
 
-process.on("message", async ({ phone, debuggerAddress }) => {
+export interface ScreencastMessageListenerMessage {
+  jobId: string,
+  debuggerAddress: {
+    host: string;
+    port: number;
+  };
+}
+
+process.on("message", async ({ jobId, debuggerAddress }: ScreencastMessageListenerMessage) => {
   let client: CDP.Client;
 
-  try {
-    const [host, port] = debuggerAddress.split(":");
+  const listener: ScreencastFrameListener = container.get("screencast-frame-listener");
 
+  try {
+    const { host, port } = debuggerAddress;
     client = await CDP({
-      host: host,
-      port: port
+      host,
+      port
     });
     const { Page } = client;
 
@@ -20,14 +29,12 @@ process.on("message", async ({ phone, debuggerAddress }) => {
     await Page.startScreencast({ format: "png", everyNthFrame: 1, quality: 100, maxWidth: 1280, maxHeight: 720 });
 
     let counter = 0;
-    const screencastId = `${phone}-${uuid()}`;
-
     Page.on("screencastFrame", async ({ data, metadata, sessionId }: Protocol.Page.ScreencastFrameEvent) => {
-      await Page.screencastFrameAck({ sessionId: sessionId });
+      await Page.screencastFrameAck({ sessionId });
 
       counter++;
 
-      await storeScreencastFrame(screencastId, `screencast-frame-${counter}.png`, data);
+      await listener.onScreencastFrame(jobId, data, counter);
     });
     client.on("disconnect", async () => {
       console.log("screencast message: ", "disconnected");

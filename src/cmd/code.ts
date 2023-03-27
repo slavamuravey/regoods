@@ -1,10 +1,8 @@
 import { Command, Option } from "commander";
-import { run } from "../app/worker/code";
 import { container } from "../app/service-container";
-import { WbUserRepository } from "../app/repository/wb-user";
-import fs from "fs";
-import { createDeliveryCodesErrorsFilePath, createDeliveryCodesFilePath } from "../utils/utils";
-import { runWorkers } from "../app/worker/worker";
+import type { WbUserRepository } from "../app/repository/wb-user";
+import { Scenario } from "../app/usecase/scenario";
+import type { WorkersLauncher } from "../app/worker/workers-launcher";
 
 export const codeCmd = new Command();
 
@@ -32,22 +30,17 @@ codeCmd
     const phones = phone ? [phone] : (await wbUserRepository.findAll()).map(wbUser => wbUser.phone);
     const paramsList = phones.map(phone => ({ phone, browser, proxy, headless, quit, screencast }));
 
-    await fs.promises.writeFile(createDeliveryCodesFilePath(), [
-      "phone",
-      "profileName",
-      "size",
-      "sizeRu",
-      "address",
-      "code",
-      "status",
-      "vendorCode"
-    ].join(",") + "\n");
-
-    await runWorkers(
-      paramsList[Symbol.iterator](),
-      run,
+    const workersLauncher: WorkersLauncher = container.get("workers-launcher");
+    await workersLauncher.launch({
+      scenario: Scenario.Code,
+      paramsIterator: paramsList[Symbol.iterator](),
       workersCount,
-      workerRetries,
-      createDeliveryCodesErrorsFilePath()
-    );
+      retriesCount: workerRetries,
+      getParamsKey: (jobIndex: number, params: any) => params.phone,
+      messageListeners: [
+        container.get("debugger-address-message-listener"),
+        container.get("need-stop-message-listener"),
+        container.get("delivery-item-message-listener")
+      ]
+    });
   });

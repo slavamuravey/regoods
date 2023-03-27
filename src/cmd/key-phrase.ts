@@ -1,9 +1,8 @@
 import { Command, Option } from "commander";
-import { run } from "../app/worker/key-phrase";
 import { container } from "../app/service-container";
-import { WbUserRepository } from "../app/repository/wb-user";
-import { createKeyPhraseErrorsFilePath } from "../utils/utils";
-import { runWorkers } from "../app/worker/worker";
+import type { WbUserRepository } from "../app/repository/wb-user";
+import type { WorkersLauncher } from "../app/worker/workers-launcher";
+import { Scenario } from "../app/usecase/scenario";
 
 export const keyPhraseCmd = new Command();
 
@@ -49,11 +48,16 @@ keyPhraseCmd
       }
     }();
 
-    await runWorkers(
-      paramsGenerator,
-      run,
+    const workersLauncher: WorkersLauncher = container.get("workers-launcher");
+    await workersLauncher.launch({
+      scenario: Scenario.KeyPhrase,
+      paramsIterator: paramsGenerator,
       workersCount,
-      workerRetries,
-      createKeyPhraseErrorsFilePath()
-    );
+      retriesCount: workerRetries,
+      getParamsKey: (jobIndex: number, params: any) => params.phone,
+      messageListeners: [
+        container.get("debugger-address-message-listener"),
+        container.get("need-stop-message-listener")
+      ]
+    });
   });
