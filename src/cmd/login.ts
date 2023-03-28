@@ -1,7 +1,7 @@
 import { Command, Option } from "commander";
 import type { WorkersLauncher } from "../app/worker/workers-launcher";
 import { container } from "../app/service-container";
-import { Scenario } from "../app/usecase/scenario";
+import { Scenario } from "../app/scenario/scenario";
 
 export const loginCmd = new Command();
 

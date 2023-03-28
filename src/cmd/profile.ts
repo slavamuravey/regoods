@@ -1,8 +1,8 @@
 import { Command, Option } from "commander";
 import { container } from "../app/service-container";
-import type { ProfileUsecase } from "../app/usecase/profile";
-import type { StepMessage } from "../app/usecase/step-message";
-import { UsecaseError } from "../app/usecase/error";
+import type { ProfileScenario } from "../app/scenario/profile";
+import type { StepMessage } from "../app/scenario/step-message";
+import { ScenarioError } from "../app/scenario/error";
 
 export const profileCmd = new Command();
 
@@ -22,9 +22,9 @@ profileCmd
   .addOption(new Option("--headless", "enable headless mode"))
   .addOption(new Option("--no-quit", "turn off quit on finish"))
   .action(async ({ phone, browser, proxy, headless, quit }) => {
-    const profileUsecase: ProfileUsecase = container.get("profile-usecase");
+    const profileScenario: ProfileScenario = container.get("profile-scenario");
 
-    const profileGenerator: AsyncGenerator<StepMessage> = profileUsecase.profile({
+    const profileGenerator: AsyncGenerator<StepMessage> = profileScenario.profile({
       phone,
       browser,
       proxy,
@@ -37,7 +37,7 @@ profileCmd
         console.log(msg);
       }
     } catch (e) {
-      if (e instanceof UsecaseError) {
+      if (e instanceof ScenarioError) {
         console.error(e);
 
         return;

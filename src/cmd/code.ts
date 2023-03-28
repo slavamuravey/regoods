@@ -1,8 +1,10 @@
 import { Command, Option } from "commander";
 import { container } from "../app/service-container";
 import type { WbUserRepository } from "../app/repository/wb-user";
-import { Scenario } from "../app/usecase/scenario";
+import { Scenario } from "../app/scenario/scenario";
 import type { WorkersLauncher } from "../app/worker/workers-launcher";
+import fs from "fs";
+import { createDeliveryCodesFilePath } from "../utils/utils";
 
 export const codeCmd = new Command();
 
@@ -29,6 +31,17 @@ codeCmd
     const wbUserRepository: WbUserRepository = container.get("wb-user-repository");
     const phones = phone ? [phone] : (await wbUserRepository.findAll()).map(wbUser => wbUser.phone);
     const paramsList = phones.map(phone => ({ phone, browser, proxy, headless, quit, screencast }));
+
+    await fs.promises.writeFile(createDeliveryCodesFilePath(), [
+      "phone",
+      "profileName",
+      "size",
+      "sizeRu",
+      "address",
+      "code",
+      "status",
+      "vendorCode"
+    ].join(",") + "\n");
 
     const workersLauncher: WorkersLauncher = container.get("workers-launcher");
     await workersLauncher.launch({

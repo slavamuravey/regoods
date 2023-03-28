@@ -2,7 +2,7 @@ import { Command, Option } from "commander";
 import { container } from "../app/service-container";
 import type { WbUserRepository } from "../app/repository/wb-user";
 import type { WorkersLauncher } from "../app/worker/workers-launcher";
-import { Scenario } from "../app/usecase/scenario";
+import { Scenario } from "../app/scenario/scenario";
 
 export const keyPhraseCmd = new Command();
 

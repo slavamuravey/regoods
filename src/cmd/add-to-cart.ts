@@ -2,10 +2,10 @@ import { Command, Option } from "commander";
 import { createRedemptionFilePath } from "../utils/utils";
 import { parseCsvFile } from "../libs/csv";
 import { addToCartFileFieldsConfig } from "./config";
-import type { AddToCartParams } from "../app/usecase/add-to-cart";
+import type { AddToCartParams } from "../app/scenario/add-to-cart";
 import type { WorkersLauncher } from "../app/worker/workers-launcher";
 import { container } from "../app/service-container";
-import { Scenario } from "../app/usecase/scenario";
+import { Scenario } from "../app/scenario/scenario";
 
 export const addToCartCmd = new Command();
 
