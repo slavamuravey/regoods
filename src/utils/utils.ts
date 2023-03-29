@@ -78,6 +78,10 @@ export function createDeliveryCodesFilePath(): string {
   return path.resolve(createDataDirPath(), "codes.csv");
 }
 
+export function createOrdersFilePath(): string {
+  return path.resolve(createDataDirPath(), "orders.csv");
+}
+
 export function createRedemptionFilePath(): string {
   return path.resolve(createDataDirPath(), "redemption.csv");
 }

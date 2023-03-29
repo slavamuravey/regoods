@@ -50,3 +50,22 @@ export class DeliveryItemNotification implements StepMessage {
 
   constructor(public readonly description: string, public readonly data: DeliveryItem) {}
 }
+
+export const OrderItemNotificationStepMessageType = "order-item-notification";
+
+export interface OrderItem {
+  phone: string;
+  vendorCode: string;
+  name: string;
+  price: string;
+  size: string;
+  orderDate: string;
+  receiveDate: string;
+  status: string;
+}
+
+export class OrderItemNotification implements StepMessage {
+  type = OrderItemNotificationStepMessageType;
+
+  constructor(public readonly description: string, public readonly data: OrderItem) {}
+}

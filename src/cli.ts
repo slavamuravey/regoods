@@ -11,6 +11,7 @@ import { loginCmd } from "./cmd/login";
 import { addToCartCmd } from "./cmd/add-to-cart";
 import { codeCmd } from "./cmd/code";
 import { keyPhraseCmd } from "./cmd/key-phrase";
+import { orderCmd } from "./cmd/order";
 
 const program = new Command();
 
@@ -24,5 +25,6 @@ program.addCommand(loginCmd);
 program.addCommand(addToCartCmd);
 program.addCommand(codeCmd);
 program.addCommand(keyPhraseCmd);
+program.addCommand(orderCmd);
 
 program.parse();

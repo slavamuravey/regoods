@@ -4,15 +4,24 @@ import { StepMessage } from "./step-message";
 import { AddToCartScenario } from "./add-to-cart";
 import { KeyPhraseScenario } from "./key-phrase";
 import { LoginParams, LoginScenario } from "./login";
+import { OrderScenario } from "./order";
 
 export enum Scenario {
   Code = "code",
   AddToCart = "add-to-cart",
   KeyPhrase = "key-phrase",
-  Login = "login"
+  Login = "login",
+  Order = "order",
 }
 
 export const scenarioGeneratorFactories = new Map<Scenario, (params: any) => AsyncGenerator<StepMessage>>();
+
+scenarioGeneratorFactories.set(Scenario.Order, (params: any) => {
+  const scenario: OrderScenario = container.get("order-scenario");
+  const { phone, browser, proxy, headless, quit } = params;
+
+  return scenario.order({ phone, browser, proxy, headless, quit });
+});
 
 scenarioGeneratorFactories.set(Scenario.Code, (params: any) => {
   const scenario: CodeScenario = container.get("code-scenario");
