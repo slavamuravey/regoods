@@ -83,11 +83,6 @@ export class CodeScenarioImpl implements CodeScenario {
         deliveryAddresses = await wait(until.elementsLocated(By.className("delivery-block__content")));
       }
 
-      const itemsActualCount = (await driver.findElements(By.className("goods-list-delivery__price-value"))).length;
-      if (itemsActualCount !== itemsDeliveryNotificationIconCount) {
-        throw new Error(`items count mismatched, icon: ${itemsDeliveryNotificationIconCount}, actual: ${itemsActualCount}`);
-      }
-
       await driver.sleep(SECOND * 2);
 
       for (const deliveryAddress of deliveryAddresses) {
