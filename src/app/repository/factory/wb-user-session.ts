@@ -1,8 +1,8 @@
 import { WbUserSessionRepositoryImpl } from "../impl/wb-user-session";
-import type { Container, ServiceFactory } from "../../../libs/service-container/types";
+import type { ServiceContainer, ServiceFactory } from "vorarbeiter";
 
 export class WbUserSessionRepositoryFactory implements ServiceFactory {
-  create(container: Container): WbUserSessionRepositoryImpl {
+  create(container: ServiceContainer): WbUserSessionRepositoryImpl {
     return new WbUserSessionRepositoryImpl();
   }
 }

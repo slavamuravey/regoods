@@ -1,8 +1,8 @@
 import { RandomNameGeneratorImpl } from "../impl/random-name-generator";
-import type { Container, ServiceFactory } from "../../../libs/service-container/types";
+import type { ServiceContainer, ServiceFactory } from "vorarbeiter";
 
 export class RandomNameGeneratorFactory implements ServiceFactory {
-  create(container: Container): RandomNameGeneratorImpl {
+  create(container: ServiceContainer): RandomNameGeneratorImpl {
     return new RandomNameGeneratorImpl(container.get("random-data-tools-client"));
   }
 }

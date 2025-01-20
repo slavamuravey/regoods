@@ -1,8 +1,8 @@
-import type { Container, ServiceFactory } from "../../../../libs/service-container/types";
+import type { ServiceContainer, ServiceFactory } from "vorarbeiter";
 import { NeedStopMessageListener } from "../../impl/message-listener/need-stop";
 
 export class NeedStopMessageListenerFactory implements ServiceFactory {
-  create(container: Container) {
+  create(container: ServiceContainer) {
     return new NeedStopMessageListener();
   }
 }

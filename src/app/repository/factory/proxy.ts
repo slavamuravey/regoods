@@ -1,8 +1,8 @@
-import type { Container, ServiceFactory } from "../../../libs/service-container/types";
+import type { ServiceContainer, ServiceFactory } from "vorarbeiter";
 import { ProxyRepositoryImpl } from "../impl/proxy";
 
 export class ProxyRepositoryFactory implements ServiceFactory {
-  create(container: Container): ProxyRepositoryImpl {
+  create(container: ServiceContainer): ProxyRepositoryImpl {
     return new ProxyRepositoryImpl();
   }
 }

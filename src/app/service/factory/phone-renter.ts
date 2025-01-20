@@ -1,8 +1,8 @@
 import { PhoneRenterImpl } from "../impl/phone-renter";
-import type { Container, ServiceFactory } from "../../../libs/service-container/types";
+import type { ServiceContainer, ServiceFactory } from "vorarbeiter";
 
 export class PhoneRenterFactory implements ServiceFactory {
-  create(container: Container): PhoneRenterImpl {
+  create(container: ServiceContainer): PhoneRenterImpl {
     return new PhoneRenterImpl(container.get("sms-activate-client"));
   }
 }

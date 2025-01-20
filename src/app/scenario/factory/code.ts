@@ -1,10 +1,10 @@
 import { CodeScenarioImpl } from "../impl/code";
-import type { Container, ServiceFactory } from "../../../libs/service-container/types";
+import type { ServiceContainer, ServiceFactory } from "vorarbeiter";
 import type { WbUserSessionRepository } from "../../repository/wb-user-session";
 import type { ProxyResolver } from "../../service/proxy-resolver";
 
 export class CodeScenarioFactory implements ServiceFactory {
-  create(container: Container): CodeScenarioImpl {
+  create(container: ServiceContainer): CodeScenarioImpl {
     const wbUserSessionRepository: WbUserSessionRepository = container.get("wb-user-session-repository");
     const proxyResolver: ProxyResolver = container.get("proxy-resolver");
 
